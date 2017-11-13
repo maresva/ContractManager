@@ -4,8 +4,6 @@ import cz.zcu.kiv.contractparser.Api;
 import cz.zcu.kiv.contractparser.model.JavaFile;
 import cz.zcu.kiv.contractparser.io.IOServices;
 import cz.zcu.kiv.contractparser.model.*;
-import cz.zcu.kiv.contractparser.parser.ContractParser;
-import cz.zcu.kiv.contractparser.parser.ContractType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
