@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="438.00042724609375" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="contractmanager.Controller">
+  <children>
+    <SplitPane dividerPositions="0.726161369193154" focusTraversable="true" layoutX="13.0" layoutY="14.0" orientation="VERTICAL" prefHeight="410.00042724609375" prefWidth="572.0">
+      <items>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <children>
+            <SplitPane dividerPositions="0.5017605633802817" focusTraversable="true" layoutX="0.0" layoutY="0.0" prefHeight="294.0" prefWidth="570.0">
+              <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                  <children>
+                    <ListView layoutX="12.0" layoutY="28.0" prefHeight="213.0" prefWidth="256.0" />
+                    <Button layoutX="14.0" layoutY="257.0" mnemonicParsing="false" onAction="#addFiles" text="%buttonAddFiles" />
+                    <Button layoutX="104.0" layoutY="257.0" mnemonicParsing="false" text="Generate Selected" />
+                    <Label layoutX="14.0" layoutY="12.0" text="List of Java files" />
+                  </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                  <children>
+                    <TextArea id="ta_details" layoutX="14.0" layoutY="27.0" prefHeight="213.0" prefWidth="256.0" wrapText="true" />
+                    <Button layoutX="14.0" layoutY="257.0" mnemonicParsing="false" text="%buttonExportToJson" />
+                    <Label layoutX="14.0" layoutY="11.0" text="File Details" />
+                  </children>
+                </AnchorPane>
+              </items>
+            </SplitPane>
+          </children>
+        </AnchorPane>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="128.00042724609375" prefWidth="570.0">
+          <children>
+            <TextArea layoutX="13.0" layoutY="29.0" prefHeight="67.0" prefWidth="546.0" wrapText="true" />
+            <Label layoutX="14.0" layoutY="14.0" text="Console" />
+          </children>
+        </AnchorPane>
+      </items>
+    </SplitPane>
+  </children>
+</AnchorPane>
