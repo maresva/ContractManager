@@ -1,6 +1,7 @@
-package contractmanager;
+package contractmanager.model;
 
-import cz.zcu.kiv.contractparser.Api;
+import cz.zcu.kiv.contractparser.ContractManagerApi;
+import cz.zcu.kiv.contractparser.io.IOServices;
 import cz.zcu.kiv.contractparser.model.ContractType;
 import cz.zcu.kiv.contractparser.model.JavaFile;
 
@@ -23,8 +24,10 @@ public class DataModel {
         this.files = new ArrayList<>();
         this.contractTypes = new HashMap<>();
 
-        contractTypes.put(ContractType.GUAVA, true);
-        contractTypes.put(ContractType.JSR305, false);
+        // add all available contract types
+        for(ContractType contractType : ContractType.values()){
+            contractTypes.put(contractType, true);
+        }
     }
 
     public boolean addFile(File newFile) {
@@ -40,7 +43,7 @@ public class DataModel {
 
         // if the file is not in the list yet - add it
         if (!found) {
-            JavaFile javaFile = Api.retrieveContracts(newFile, contractTypes);
+            JavaFile javaFile = ContractManagerApi.retrieveContracts(newFile, contractTypes);
             files.add(javaFile);
             return true;
         }
@@ -49,7 +52,7 @@ public class DataModel {
         }
     }
 
-    public void removeFiles(List<Integer> fileIds) {
+    public int removeFiles(List<Integer> fileIds) {
 
         int deletedFiles = 0;
 
@@ -62,6 +65,30 @@ public class DataModel {
                 deletedFiles++;
             }
         }
+
+        return deletedFiles;
+    }
+
+    public int exportToJSON(List<Integer> fileIds, File outputFolder) {
+
+        int exportedFiles = 0;
+
+        for(int index : fileIds){
+
+            if(index < files.size()) {
+                try {
+                    IOServices.exportToJson(files.get(index), outputFolder);
+                    exportedFiles++;
+                }
+                catch(Exception e){
+                    System.err.println("LOG ERROR");
+                    // TODO handle error
+                }
+
+            }
+        }
+
+        return exportedFiles;
     }
 
 
@@ -72,6 +99,10 @@ public class DataModel {
 
     public JavaFile getCurrentFile() {
         return currentFile;
+    }
+
+    public HashMap<ContractType, Boolean> getContractTypes() {
+        return contractTypes;
     }
 
     public void setCurrentFile(JavaFile currentFile) {
