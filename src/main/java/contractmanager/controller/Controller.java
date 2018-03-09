@@ -1,5 +1,9 @@
 package contractmanager.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import contractmanager.view.ContractManager;
 import cz.zcu.kiv.contractparser.io.IOServices;
 import cz.zcu.kiv.contractparser.model.ContractType;
@@ -58,7 +62,7 @@ public class Controller {
         if (files != null) {
 
             showLoadingWindow();
-            addFiles(files);
+            addFiles(files, null);
         }
     }
 
@@ -79,15 +83,8 @@ public class Controller {
         File selectedDirectory = chooser.showDialog(mainStage);
 
         if(selectedDirectory != null) {
-
-            List<File> files = new ArrayList<>();
-            IOServices.getFilesFromFolder(selectedDirectory, files);
-
-            System.out.println("FILES IN FOLDER: " + files.size());
-
-            // display loading window and process files
             showLoadingWindow();
-            addFiles(files);
+            addFiles(null, selectedDirectory);
         }
     }
 
@@ -97,9 +94,9 @@ public class Controller {
      * File processing is done via JavaFX task and during this action loading window is displayed which show current
      * progress on progress bar (each processed file updates progress bar).
      *
-     * @param files     List of files to be parsed
+     * @param inputFiles     List of files to be parsed
      */
-    private void addFiles(List<File> files) {
+    private void addFiles(List<File> inputFiles, File selectedDirectory) {
 
         // get progress bar
         ProgressBar pb_loading = (ProgressBar) loadingScene.lookup("#pb_loading");
@@ -107,6 +104,16 @@ public class Controller {
         // start task
         Task<Boolean> task = new Task<Boolean>() {
             @Override public Boolean call() {
+
+                List<File> files;
+
+                if(inputFiles == null){
+                    files = new ArrayList<>();
+                    IOServices.getFilesFromFolder(selectedDirectory, files);
+                }
+                else{
+                    files = inputFiles;
+                }
 
                 // how much should bar increase with one completed file
                 double progressIncrease = 1.0 / (double)files.size();
@@ -136,9 +143,17 @@ public class Controller {
         task.setOnRunning((e) -> loadingStage.show());
 
         // otherwise hide Loading window and update list
-        task.setOnSucceeded((e) -> hideLoadingWindow());
-        task.setOnFailed((e) -> hideLoadingWindow());
-        task.setOnCancelled((e) -> hideLoadingWindow());
+        task.setOnSucceeded((e) -> {
+            hideLoadingWindow();
+        });
+        task.setOnFailed((e) -> {
+            Throwable throwable = task.getException();
+            throwable.printStackTrace();
+            hideLoadingWindow();
+        });
+        task.setOnCancelled((e) -> {
+            hideLoadingWindow();
+        });
 
         new Thread(task).start();
     }
@@ -295,31 +310,35 @@ public class Controller {
 
         // get selected file and save it into data model
         int selectedId = clv_files.getSelectionModel().getSelectedIndex();
-        JavaFile selectedFile = ContractManager.dataModel.getFiles().get(selectedId);
-        ContractManager.dataModel.setCurrentFile(selectedFile);
 
-        // update label with name of the file
-        Label lbl_filename_value = (Label) ContractManager.scene.lookup("#lbl_filename_value");
-        lbl_filename_value.setText(selectedFile.getFileName() + "." + selectedFile.getFileType().toString().toLowerCase());
+        if(selectedId >= 0 && selectedId < ContractManager.dataModel.getFiles().size()) {
 
-        // update label with file path
-        Label lbl_path_value = (Label) ContractManager.scene.lookup("#lbl_path_value");
-        lbl_path_value.setText(selectedFile.getPath());
+            JavaFile selectedFile = ContractManager.dataModel.getFiles().get(selectedId);
+            ContractManager.dataModel.setCurrentFile(selectedFile);
 
-        // display number of contracts for each selected design by contract type
-        for(Map.Entry<ContractType, Boolean> entry : ContractManager.dataModel.getContractTypes().entrySet()) {
-            ContractType contractType = entry.getKey();
-            boolean used = entry.getValue();
+            // update label with name of the file
+            Label lbl_filename_value = (Label) ContractManager.scene.lookup("#lbl_filename_value");
+            lbl_filename_value.setText(selectedFile.getCompleteFileName());
 
-            if(used) {
-                Label lbl_value = (Label) ContractManager.scene.lookup("#lbl_" + contractType.name());
-                lbl_value.setText("" + selectedFile.getNumberOfContracts().get(contractType));
+            // update label with file path
+            Label lbl_path_value = (Label) ContractManager.scene.lookup("#lbl_path_value");
+            lbl_path_value.setText(selectedFile.getPath());
+
+            // display number of contracts for each selected design by contract type
+            for (Map.Entry<ContractType, Boolean> entry : ContractManager.dataModel.getContractTypes().entrySet()) {
+                ContractType contractType = entry.getKey();
+                boolean used = entry.getValue();
+
+                if (used) {
+                    Label lbl_value = (Label) ContractManager.scene.lookup("#lbl_" + contractType.name());
+                    lbl_value.setText("" + selectedFile.getNumberOfContracts().get(contractType));
+                }
             }
-        }
 
-        // once some file is selected - Show details button becomes available
-        Button btn_show_details = (Button) ContractManager.scene.lookup("#btn_show_details");
-        btn_show_details.setDisable(false);
+            // once some file is selected - Show details button becomes available
+            Button btn_show_details = (Button) ContractManager.scene.lookup("#btn_show_details");
+            btn_show_details.setDisable(false);
+        }
     }
 
 
@@ -335,11 +354,18 @@ public class Controller {
         // update Select all check box (is checked only if all files are selected)
         Button btn_select_all = (Button) ContractManager.scene.lookup("#btn_select_all");
 
+        Button btn_remove_files = (Button) ContractManager.scene.lookup("#btn_remove_files");
+        Button btn_export_files = (Button) ContractManager.scene.lookup("#btn_export_files");
+
         if(numberOfFilesTotal-numberOfFilesChecked == 0){
             btn_select_all.setText(ContractManager.localization.getString("buttonDeselectAll"));
+            btn_remove_files.setDisable(false);
+            btn_export_files.setDisable(false);
         }
         else{
             btn_select_all.setText(ContractManager.localization.getString("buttonSelectAll"));
+            btn_remove_files.setDisable(true);
+            btn_export_files.setDisable(true);
         }
 
         // update info label about number of selected files
@@ -391,24 +417,46 @@ public class Controller {
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
-                
+
+                // set default window size
+                double height = Double.parseDouble(ContractManager.properties.getString("detailsWindowWidth"));
+                double width = Double.parseDouble(ContractManager.properties.getString("detailsWindowHeight"));
+                stage.setHeight(height);
+                stage.setWidth(width);
+                stage.setMinHeight(height);
+                stage.setMinWidth(width);
+
                 stage.setTitle(ContractManager.localization.getString("windowTitleDetails") + " - "
                         + ContractManager.dataModel.getCurrentFile().getPath());
                 stage.getIcons().add(new Image(ContractManager.properties.getString("icon")));
                 stage.show();
 
+                // get selected java file and convert it to JSON
+                JavaFile javaFile = ContractManager.dataModel.getCurrentFile();
+                Gson gson = new Gson();
+                String jsonInString = gson.toJson(javaFile);
+
+                // object in JSON convert to "pretty print" string
+                JsonParser parser = new JsonParser();
+                gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonElement el = parser.parse(jsonInString);
+                jsonInString = gson.toJson(el);
+
                 TextArea ta_details = (TextArea) scene.lookup("#ta_details");
-                ta_details.setText(ContractManager.dataModel.getCurrentFile().toString());
+                ta_details.setText(jsonInString);
 
                 Label lbl_filename_value = (Label) scene.lookup("#lbl_filename_value");
-                lbl_filename_value.setText(ContractManager.dataModel.getCurrentFile().getFileName());
-
-                Label lbl_file_type_value = (Label) scene.lookup("#lbl_file_type_value");
-                lbl_file_type_value.setText(ContractManager.dataModel.getCurrentFile().getFileType().toString());
+                lbl_filename_value.setText(ContractManager.dataModel.getCurrentFile().getCompleteFileName());
 
                 Label lbl_path_value = (Label) scene.lookup("#lbl_path_value");
                 lbl_path_value.setText(ContractManager.dataModel.getCurrentFile().getPath());
-                
+
+                Label lbl_number_classes_value = (Label) scene.lookup("#lbl_number_classes_value");
+                lbl_number_classes_value.setText("" + ContractManager.dataModel.getCurrentFile().getNumberOfClasses());
+
+                Label lbl_number_methods_value = (Label) scene.lookup("#lbl_number_methods_value");
+                lbl_number_methods_value.setText("" + ContractManager.dataModel.getCurrentFile().getNumberOfMethods());
+
             } catch (Exception e) {
                  e.printStackTrace();
             }

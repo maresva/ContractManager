@@ -52,6 +52,14 @@ public class ContractManager extends Application {
         stage.setTitle(localization.getString("windowTitle"));
         stage.getIcons().add(new Image(properties.getString("icon")));
 
+        // set default window size
+        double height = Double.parseDouble(properties.getString("mainWindowWidth"));
+        double width = Double.parseDouble(properties.getString("mainWindowHeight"));
+        stage.setHeight(height);
+        stage.setWidth(width);
+        stage.setMinHeight(height);
+        stage.setMinWidth(width);
+
         scene = new Scene(root);
         stage.setScene(scene);
 
@@ -85,7 +93,7 @@ public class ContractManager extends Application {
 
                 Label lbl_value = new Label();
                 lbl_value.setId("lbl_" + contractType.name());
-                lbl_value.setText("0");
+                lbl_value.setText("");
 
                 grid_details.addRow(row, lbl_title);
                 grid_details.add(lbl_value, 1, row);

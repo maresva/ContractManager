@@ -7,8 +7,11 @@ import cz.zcu.kiv.contractparser.model.JavaFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.util.Comparator.comparing;
 
 /**
  * @Author Václav Mareš
@@ -35,6 +38,15 @@ public class DataModel {
         // check whether this file is not already present
         boolean found = false;
         for(JavaFile javaFile : files) {
+
+            if(javaFile == null){
+                System.out.println("javaFile je NULL");
+            }
+
+            if(newFile == null) {
+                System.out.println("newFile je NULL");
+            }
+
             if(javaFile.getPath().equals(newFile.getPath())) {
                 found = true;
                 break;
@@ -44,8 +56,14 @@ public class DataModel {
         // if the file is not in the list yet - add it
         if (!found) {
             JavaFile javaFile = ContractManagerApi.retrieveContracts(newFile, contractTypes);
-            files.add(javaFile);
-            return true;
+
+            if(javaFile != null) {
+                files.add(javaFile);
+                return true;
+            }
+            else{
+                return false;
+            }
         }
         else{
             return false;
@@ -94,6 +112,7 @@ public class DataModel {
 
 
     public List<JavaFile> getFiles() {
+        Collections.sort(files, comparing(JavaFile::getPath));
         return files;
     }
 
