@@ -24,7 +24,7 @@ import java.util.*;
 
 public class ContractManager extends Application {
 
-    final Logger logger = Logger.getLogger(String.valueOf(ContractManager.class));
+    //final Logger logger = Logger.getLogger(String.valueOf(ContractManager.class));
 
     public static final ResourceBundle properties = ResourceBundle.getBundle("contractmanager");
     public static final ResourceBundle localization = ResourceBundle.getBundle("contractmanager",
