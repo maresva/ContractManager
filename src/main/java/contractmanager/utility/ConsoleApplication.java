@@ -1,6 +1,6 @@
 package contractmanager.utility;
 
-import cz.zcu.kiv.contractparser.ContractManagerApi;
+import cz.zcu.kiv.contractparser.ContractExtractorApi;
 import cz.zcu.kiv.contractparser.io.IOServices;
 import cz.zcu.kiv.contractparser.model.ContractType;
 import cz.zcu.kiv.contractparser.model.JavaFile;
@@ -51,12 +51,12 @@ public class ConsoleApplication {
 
             // TODO volba ktery export provest
             if(input.isFile()){
-                JavaFile javaFile = ContractManagerApi.retrieveContracts(input, contractTypes);
-                IOServices.exportToJson(javaFile, outputFolder);
+                JavaFile javaFile = ContractExtractorApi.retrieveContracts(input, contractTypes, true);
+                IOServices.exportJavaFileToJson(javaFile, outputFolder);
             }
             else{
-                List<JavaFile> javaFiles = ContractManagerApi.retrieveContractsFromFolder(input, contractTypes);
-                IOServices.exportManyToJson(javaFiles, outputFolder);
+                List<JavaFile> javaFiles = ContractExtractorApi.retrieveContractsFromFolder(input, contractTypes, true);
+                IOServices.exportJavaFilesToJson(javaFiles, outputFolder);
             }
 
             System.out.println("End batch");

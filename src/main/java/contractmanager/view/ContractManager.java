@@ -50,7 +50,8 @@ public class ContractManager extends Application {
         }
 
         stage.setTitle(localization.getString("windowTitle"));
-        stage.getIcons().add(new Image(properties.getString("icon")));
+        // TODO zprovoznit icon v .jar
+        //stage.getIcons().add(new Image(properties.getString("icon")));
 
         // set default window size
         double height = Double.parseDouble(properties.getString("mainWindowWidth"));

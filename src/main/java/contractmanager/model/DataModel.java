@@ -1,6 +1,6 @@
 package contractmanager.model;
 
-import cz.zcu.kiv.contractparser.ContractManagerApi;
+import cz.zcu.kiv.contractparser.ContractExtractorApi;
 import cz.zcu.kiv.contractparser.io.IOServices;
 import cz.zcu.kiv.contractparser.model.ContractType;
 import cz.zcu.kiv.contractparser.model.JavaFile;
@@ -55,7 +55,7 @@ public class DataModel {
 
         // if the file is not in the list yet - add it
         if (!found) {
-            JavaFile javaFile = ContractManagerApi.retrieveContracts(newFile, contractTypes);
+            JavaFile javaFile = ContractExtractorApi.retrieveContracts(newFile, true);
 
             if(javaFile != null) {
                 files.add(javaFile);
@@ -95,7 +95,7 @@ public class DataModel {
 
             if(index < files.size()) {
                 try {
-                    IOServices.exportToJson(files.get(index), outputFolder);
+                    IOServices.exportJavaFileToJson(files.get(index), outputFolder);
                     exportedFiles++;
                 }
                 catch(Exception e){

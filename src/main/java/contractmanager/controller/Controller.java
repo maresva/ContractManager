@@ -78,8 +78,8 @@ public class Controller {
 
         // display directory chooser
         DirectoryChooser chooser = new DirectoryChooser();
-        File defaultDirectory = new File("D:\\My\\_ZCU\\dp\\anot-20170926T144409Z-001\\anot\\guava\\guava-10.0");
-        chooser.setInitialDirectory(defaultDirectory);
+        //File defaultDirectory = new File("D:\\My\\_ZCU\\dp\\anot-20170926T144409Z-001\\anot\\guava\\guava-10.0");
+        //chooser.setInitialDirectory(defaultDirectory);
         File selectedDirectory = chooser.showDialog(mainStage);
 
         if(selectedDirectory != null) {
@@ -331,7 +331,7 @@ public class Controller {
 
                 if (used) {
                     Label lbl_value = (Label) ContractManager.scene.lookup("#lbl_" + contractType.name());
-                    lbl_value.setText("" + selectedFile.getNumberOfContracts().get(contractType));
+                    lbl_value.setText("" + selectedFile.getJavaFileStatistics().getNumberOfContracts().get(contractType));
                 }
             }
 
@@ -428,7 +428,8 @@ public class Controller {
 
                 stage.setTitle(ContractManager.localization.getString("windowTitleDetails") + " - "
                         + ContractManager.dataModel.getCurrentFile().getPath());
-                stage.getIcons().add(new Image(ContractManager.properties.getString("icon")));
+                // TODO zprovoznit icon v .jar
+                //stage.getIcons().add(new Image(ContractManager.properties.getString("icon")));
                 stage.show();
 
                 // get selected java file and convert it to JSON
@@ -452,10 +453,10 @@ public class Controller {
                 lbl_path_value.setText(ContractManager.dataModel.getCurrentFile().getPath());
 
                 Label lbl_number_classes_value = (Label) scene.lookup("#lbl_number_classes_value");
-                lbl_number_classes_value.setText("" + ContractManager.dataModel.getCurrentFile().getNumberOfClasses());
+                lbl_number_classes_value.setText("" + ContractManager.dataModel.getCurrentFile().getJavaFileStatistics().getNumberOfClasses());
 
                 Label lbl_number_methods_value = (Label) scene.lookup("#lbl_number_methods_value");
-                lbl_number_methods_value.setText("" + ContractManager.dataModel.getCurrentFile().getNumberOfMethods());
+                lbl_number_methods_value.setText("" + ContractManager.dataModel.getCurrentFile().getJavaFileStatistics().getNumberOfMethods());
 
             } catch (Exception e) {
                  e.printStackTrace();
