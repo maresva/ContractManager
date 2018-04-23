@@ -254,7 +254,7 @@ public class Controller {
         for (int i = 0; i < files.size(); i++) {
 
             if(files.get(i) != null){
-                fileItems.add(files.get(i).getPath());
+                fileItems.add(files.get(i).getShortPath());
             }
         }
         clv_files.setItems(fileItems);
@@ -322,7 +322,7 @@ public class Controller {
 
             // update label with file path
             Label lbl_path_value = (Label) ContractManager.scene.lookup("#lbl_path_value");
-            lbl_path_value.setText(selectedFile.getPath());
+            lbl_path_value.setText(selectedFile.getShortPath());
 
             // display number of contracts for each selected design by contract type
             for (Map.Entry<ContractType, Boolean> entry : ContractManager.dataModel.getContractTypes().entrySet()) {
@@ -427,7 +427,7 @@ public class Controller {
                 stage.setMinWidth(width);
 
                 stage.setTitle(ContractManager.localization.getString("windowTitleDetails") + " - "
-                        + ContractManager.dataModel.getCurrentFile().getPath());
+                        + ContractManager.dataModel.getCurrentFile().getShortPath());
                 // TODO zprovoznit icon v .jar
                 //stage.getIcons().add(new Image(ContractManager.properties.getString("icon")));
                 stage.show();
@@ -450,7 +450,7 @@ public class Controller {
                 lbl_filename_value.setText(ContractManager.dataModel.getCurrentFile().getCompleteFileName());
 
                 Label lbl_path_value = (Label) scene.lookup("#lbl_path_value");
-                lbl_path_value.setText(ContractManager.dataModel.getCurrentFile().getPath());
+                lbl_path_value.setText(ContractManager.dataModel.getCurrentFile().getShortPath());
 
                 Label lbl_number_classes_value = (Label) scene.lookup("#lbl_number_classes_value");
                 lbl_number_classes_value.setText("" + ContractManager.dataModel.getCurrentFile().getJavaFileStatistics().getNumberOfClasses());

@@ -47,7 +47,7 @@ public class DataModel {
                 System.out.println("newFile je NULL");
             }
 
-            if(javaFile.getPath().equals(newFile.getPath())) {
+            if(javaFile.getFullPath().equals(newFile.getAbsolutePath())) {
                 found = true;
                 break;
             }
@@ -91,20 +91,7 @@ public class DataModel {
 
         int exportedFiles = 0;
 
-        for(int index : fileIds){
-
-            if(index < files.size()) {
-                try {
-                    IOServices.exportJavaFileToJson(files.get(index), outputFolder);
-                    exportedFiles++;
-                }
-                catch(Exception e){
-                    System.err.println("LOG ERROR");
-                    // TODO handle error
-                }
-
-            }
-        }
+        ContractExtractorApi.exportJavaFilesToJson(files, outputFolder, true);
 
         return exportedFiles;
     }
@@ -112,7 +99,7 @@ public class DataModel {
 
 
     public List<JavaFile> getFiles() {
-        Collections.sort(files, comparing(JavaFile::getPath));
+        Collections.sort(files, comparing(JavaFile::getFullPath));
         return files;
     }
 

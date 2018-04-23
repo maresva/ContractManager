@@ -50,6 +50,7 @@
     </build>
 
     <dependencies>
+
         <!-- Contract Parser -->
         <dependency>
             <groupId>cz.zcu.kiv.contractparser</groupId>
