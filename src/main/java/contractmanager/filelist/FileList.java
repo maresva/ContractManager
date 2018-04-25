@@ -2,17 +2,14 @@ package contractmanager.filelist;
 
 import contractmanager.applicationTab.ApplicationTab;
 import contractmanager.view.ContractManager;
-import cz.zcu.kiv.contractparser.io.IOServices;
+import cz.zcu.kiv.contractparser.utils.IOServices;
 import cz.zcu.kiv.contractparser.model.JavaFile;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.CheckListView;
 
 import java.io.File;
@@ -67,7 +64,7 @@ public class FileList {
 
                 for(File file : files){
                     if (!isCancelled()) {
-                        if (ContractManager.dataModel.addFile(file)) {
+                        if (ContractManager.extractorDataModel.addFile(file)) {
                             addedFiles++;
 
                             // update progress bar
@@ -110,7 +107,7 @@ public class FileList {
         List<Integer> checkedIndexes = getSelected();
 
         // remove selected files
-        int deletedFiles = ContractManager.dataModel.removeFiles(checkedIndexes);
+        int deletedFiles = ContractManager.extractorDataModel.removeFiles(checkedIndexes);
 
         ContractManager.consoleWriter.writeNumberOfDeletedFiles(deletedFiles);
 
@@ -140,10 +137,12 @@ public class FileList {
      */
     public void updateList() {
 
+        ContractManager.extractorDataModel.updateShortPath();
+
         checkListView = (CheckListView) ContractManager.scene.lookup("#clv_files");
 
         // get current list with JavaFiles
-        List<JavaFile> files = ContractManager.dataModel.getFiles();
+        List<JavaFile> files = ContractManager.extractorDataModel.getFiles();
 
         // update list of files in checkListView
         final ObservableList<String> fileItems = FXCollections.observableArrayList();
@@ -196,6 +195,8 @@ public class FileList {
                 applicationTab.updateDetails();
             }
         });
+
+        applicationTab.updateGlobalStatistics();
     }
 
 

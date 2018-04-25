@@ -1,9 +1,10 @@
 package contractmanager.model;
 
 import cz.zcu.kiv.contractparser.ContractExtractorApi;
-import cz.zcu.kiv.contractparser.io.IOServices;
+import cz.zcu.kiv.contractparser.utils.IOServices;
 import cz.zcu.kiv.contractparser.model.ContractType;
 import cz.zcu.kiv.contractparser.model.JavaFile;
+import cz.zcu.kiv.contractparser.model.JavaFileStatistics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,11 +22,13 @@ public class DataModel {
     private List<JavaFile> files;
     private JavaFile currentFile;
     private HashMap<ContractType,Boolean> contractTypes;
+    private JavaFileStatistics globalStatistics;
 
 
     public DataModel() {
         this.files = new ArrayList<>();
         this.contractTypes = new HashMap<>();
+        this.globalStatistics = new JavaFileStatistics();
 
         // add all available contract types
         for(ContractType contractType : ContractType.values()){
@@ -54,6 +57,7 @@ public class DataModel {
                 break;
             }
         }
+        
 
         // if the file is not in the list yet - add it
         if (!found) {
@@ -61,6 +65,8 @@ public class DataModel {
 
             if(javaFile != null) {
                 files.add(javaFile);
+                globalStatistics.mergeStatistics(javaFile.getJavaFileStatistics());
+
                 return true;
             }
             else{
@@ -81,6 +87,8 @@ public class DataModel {
             int newIndex = index - deletedFiles;
 
             if(newIndex < files.size()) {
+
+                globalStatistics.detachStatistics(files.get(newIndex).getJavaFileStatistics());
                 files.remove(newIndex);
                 deletedFiles++;
             }
@@ -99,6 +107,12 @@ public class DataModel {
     }
 
 
+    public void updateShortPath() {
+
+        ContractExtractorApi.updateShortPathOfJavaFiles(files);
+    }
+
+
 
     public List<JavaFile> getFiles() {
         Collections.sort(files, comparing(JavaFile::getFullPath));
@@ -111,6 +125,10 @@ public class DataModel {
 
     public HashMap<ContractType, Boolean> getContractTypes() {
         return contractTypes;
+    }
+
+    public JavaFileStatistics getGlobalStatistics() {
+        return globalStatistics;
     }
 
     public void setCurrentFile(JavaFile currentFile) {

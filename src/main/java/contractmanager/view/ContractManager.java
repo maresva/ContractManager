@@ -1,6 +1,5 @@
 package contractmanager.view;
 
-import contractmanager.applicationTab.ApplicationTab;
 import contractmanager.controller.Controller;
 import contractmanager.model.DataModel;
 import contractmanager.utility.ConsoleApplication;
@@ -11,7 +10,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -32,7 +33,8 @@ public class ContractManager extends Application {
 
     public static Stage stage;
     public static Scene scene;
-    public static DataModel dataModel;
+    public static DataModel extractorDataModel;
+    public static DataModel comparatorDataModel;
     public static ConsoleWriter consoleWriter;
 
     @Override
@@ -47,7 +49,7 @@ public class ContractManager extends Application {
             Parent root = loader.load();
 
             stage.setTitle(localization.getString("windowTitle"));
-            // TODO zprovoznit icon v .jar
+
             stage.getIcons().add(new Image(properties.getString("icon")));
 
             // set default window size
@@ -66,37 +68,59 @@ public class ContractManager extends Application {
                 System.exit(0);
             });
 
-            dataModel = new DataModel();
+            extractorDataModel = new DataModel();
 
             Controller controller = loader.getController();
             controller.initController(stage);
 
             stage.show();
 
-            GridPane grid_details = (GridPane) scene.lookup("#grid_details");
+            GridPane gridDetails = (GridPane) scene.lookup("#gridDetails");
+            GridPane gridGlobalStats = (GridPane) scene.lookup("#gridGlobalStats");
 
             consoleWriter = new ConsoleWriter();
+            
+            int row = 0;
 
-
-            int row = 3;
-
-            for(Map.Entry<ContractType, Boolean> entry : dataModel.getContractTypes().entrySet()) {
+            for(Map.Entry<ContractType, Boolean> entry : extractorDataModel.getContractTypes().entrySet()) {
                 ContractType contractType = entry.getKey();
                 boolean used = entry.getValue();
 
+                ToolBar tb_filter = (ToolBar) scene.lookup("#tb_filter");
+                CheckBox checkBox = new CheckBox();
+                checkBox.setText(contractType.name());
+
                 if(used) {
-                    Label lbl_title = new Label();
-                    lbl_title.setText(contractType.name() + " " + localization.getString("labelContracts") + ": ");
-                    lbl_title.setFont(Font.font("System", FontWeight.BOLD, 12));
+                    Label lblTitle = new Label();
+                    lblTitle.setText(contractType.name() + " " + localization.getString("labelContracts") + ": ");
+                    lblTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
 
-                    Label lbl_value = new Label();
-                    lbl_value.setId("lbl_" + contractType.name());
-                    lbl_value.setText("");
+                    Label lblValue = new Label();
+                    lblValue.setId("lbl_" + contractType.name());
+                    lblValue.setText("");
 
-                    grid_details.addRow(row, lbl_title);
-                    grid_details.add(lbl_value, 1, row);
+                    gridDetails.addRow(row + 2, lblTitle);
+                    gridDetails.add(lblValue, 1, row + 2);
+
+
+                    Label lblGlobalStatsTitle = new Label();
+                    lblGlobalStatsTitle.setText(contractType.name() + " " + localization.getString("labelContracts") + ": ");
+                    lblGlobalStatsTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
+
+                    Label lblGlobalStatsValue = new Label();
+                    lblGlobalStatsValue.setId("lblGlobalStats" + contractType.name());
+                    lblGlobalStatsValue.setText("0");
+
+                    gridGlobalStats.addRow(row + 5, lblGlobalStatsTitle);
+                    gridGlobalStats.add(lblGlobalStatsValue, 1, row + 5);
+
                     row++;
+
+                    checkBox.setSelected(true);
                 }
+
+                tb_filter.getItems().add(checkBox);
+
             }
 
         } catch (IOException e) {

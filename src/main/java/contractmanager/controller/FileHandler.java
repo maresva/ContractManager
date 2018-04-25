@@ -36,7 +36,7 @@ public class FileHandler {
 
         if(selectedDirectory != null) {
 
-            int exportedFiles = ContractManager.dataModel.exportToJSON(fileList.getSelected(), selectedDirectory);
+            int exportedFiles = ContractManager.extractorDataModel.exportToJSON(fileList.getSelected(), selectedDirectory);
 
             ContractManager.consoleWriter.writeNumberOfExportedFiles(exportedFiles);
         }
