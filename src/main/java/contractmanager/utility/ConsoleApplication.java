@@ -2,16 +2,9 @@ package contractmanager.utility;
 
 import cz.zcu.kiv.contractparser.ContractComparatorApi;
 import cz.zcu.kiv.contractparser.ContractExtractorApi;
-import cz.zcu.kiv.contractparser.comparator.JavaFolderCompareReport;
-import cz.zcu.kiv.contractparser.io.IOServices;
-import cz.zcu.kiv.contractparser.model.ContractType;
-import cz.zcu.kiv.contractparser.model.JavaFile;
 import javafx.application.Platform;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * This class provides methods used to work with console application part of this program. It receives commands from
