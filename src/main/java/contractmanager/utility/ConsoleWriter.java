@@ -5,7 +5,7 @@ import javafx.scene.control.TextArea;
 
 public class ConsoleWriter {
 
-    TextArea ta_console;
+    private TextArea ta_console;
 
 
     public ConsoleWriter() {

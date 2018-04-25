@@ -14,7 +14,7 @@ import java.util.List;
 import static java.util.Comparator.comparing;
 
 /**
- * @Author Václav Mareš
+ * @author Václav Mareš
  */
 public class DataModel {
 
@@ -41,10 +41,12 @@ public class DataModel {
 
             if(javaFile == null){
                 System.out.println("javaFile je NULL");
+                return false;
             }
 
             if(newFile == null) {
                 System.out.println("newFile je NULL");
+                return false;
             }
 
             if(javaFile.getFullPath().equals(newFile.getAbsolutePath())) {

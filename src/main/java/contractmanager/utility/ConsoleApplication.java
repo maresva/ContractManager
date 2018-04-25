@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * This class provides methods used to work with console application part of this program. It receives commands from user,
- * evaluates them and either executes them or report an error.
+ * This class provides methods used to work with console application part of this program. It receives commands from
+ * user, evaluates them and either executes them or report an error.
  *
  * @author Vaclav Mares
  * */
@@ -66,7 +66,7 @@ public class ConsoleApplication {
      * reported only changes affecting contracts. Last -m says that JSON files will be in minimalistic format instead
      * of use of pretty print.
      *
-     * -c <first_input_folder> <second_input_folder> <output_folder> [-q] [-o] [-m]
+     * -c <input_folder1> <input_folder2> <output_folder> [-q] [-o] [-m]
      *
      * @param args  Application input arguments
      */
