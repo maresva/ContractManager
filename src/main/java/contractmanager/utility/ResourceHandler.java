@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 public class ResourceHandler {
 
     /** Log4j for this class */
-    private static final Logger logger = Logger.getLogger(String.valueOf(cz.zcu.kiv.contractparser.ResourceHandler.class));
+    private static final Logger logger = Logger.getLogger(ResourceHandler.class);
 
     /** ResourceBundle with properties */
     private static final ResourceBundle properties = ResourceBundle.getBundle("contractmanager");
