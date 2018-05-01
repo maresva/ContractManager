@@ -1,132 +1,39 @@
 package contractmanager.view;
 
 import contractmanager.controller.Controller;
-import contractmanager.model.DataModel;
+import contractmanager.presentation.ApplicationData;
 import contractmanager.utility.ConsoleApplication;
-import contractmanager.utility.ConsoleWriter;
-import cz.zcu.kiv.contractparser.model.ContractType;
+import contractmanager.utility.ResourceHandler;
+import cz.zcu.kiv.contractparser.api.ApiFactory;
+import cz.zcu.kiv.contractparser.api.BatchContractComparatorApi;
+import cz.zcu.kiv.contractparser.api.BatchContractExtractorApi;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.*;
 
 
 public class ContractManager extends Application {
 
-    //final Logger logger = Logger.getLogger(String.valueOf(ContractManager.class));
+    /** Log4j logger for this class */
+    private final static Logger logger = Logger.getLogger(String.valueOf(ContractManager.class));
 
-    public static final ResourceBundle properties = ResourceBundle.getBundle("contractmanager");
-    public static final ResourceBundle localization = ResourceBundle.getBundle("contractmanager",
-            new Locale("en", "EN"));
+    public static final Font DEFAULT_LABEL_TITLE_FONT = Font.font("System", FontWeight.BOLD, 12);
 
     public static Stage stage;
     public static Scene scene;
-    public static DataModel extractorDataModel;
-    public static DataModel comparatorDataModel;
-    public static ConsoleWriter consoleWriter;
-
-    @Override
-    public void start(Stage _stage) {
-
-        stage = _stage;
-
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(properties.getString("sceneFileName")));
-        loader.setResources(localization);
-
-        try {
-            Parent root = loader.load();
-
-            stage.setTitle(localization.getString("windowTitle"));
-
-            stage.getIcons().add(new Image(properties.getString("icon")));
-
-            // set default window size
-            double height = Double.parseDouble(properties.getString("mainWindowWidth"));
-            double width = Double.parseDouble(properties.getString("mainWindowHeight"));
-            stage.setHeight(height);
-            stage.setWidth(width);
-            stage.setMinHeight(height);
-            stage.setMinWidth(width);
-
-            scene = new Scene(root);
-            stage.setScene(scene);
-
-            stage.setOnCloseRequest(e -> {
-                Platform.exit();
-                System.exit(0);
-            });
-
-            extractorDataModel = new DataModel();
-
-            Controller controller = loader.getController();
-            controller.initController(stage);
-
-            stage.show();
-
-            GridPane gridDetails = (GridPane) scene.lookup("#gridDetails");
-            GridPane gridGlobalStats = (GridPane) scene.lookup("#gridGlobalStats");
-
-            consoleWriter = new ConsoleWriter();
-            
-            int row = 0;
-
-            for(Map.Entry<ContractType, Boolean> entry : extractorDataModel.getContractTypes().entrySet()) {
-                ContractType contractType = entry.getKey();
-                boolean used = entry.getValue();
-
-                ToolBar tb_filter = (ToolBar) scene.lookup("#tb_filter");
-                CheckBox checkBox = new CheckBox();
-                checkBox.setText(contractType.name());
-
-                if(used) {
-                    Label lblTitle = new Label();
-                    lblTitle.setText(contractType.name() + " " + localization.getString("labelContracts") + ": ");
-                    lblTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
-
-                    Label lblValue = new Label();
-                    lblValue.setId("lbl_" + contractType.name());
-                    lblValue.setText("");
-
-                    gridDetails.addRow(row + 2, lblTitle);
-                    gridDetails.add(lblValue, 1, row + 2);
 
 
-                    Label lblGlobalStatsTitle = new Label();
-                    lblGlobalStatsTitle.setText(contractType.name() + " " + localization.getString("labelContracts") + ": ");
-                    lblGlobalStatsTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
-
-                    Label lblGlobalStatsValue = new Label();
-                    lblGlobalStatsValue.setId("lblGlobalStats" + contractType.name());
-                    lblGlobalStatsValue.setText("0");
-
-                    gridGlobalStats.addRow(row + 5, lblGlobalStatsTitle);
-                    gridGlobalStats.add(lblGlobalStatsValue, 1, row + 5);
-
-                    row++;
-
-                    checkBox.setSelected(true);
-                }
-
-                tb_filter.getItems().add(checkBox);
-
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private static ApplicationData applicationData;
 
 
     /**
@@ -143,7 +50,104 @@ public class ContractManager extends Application {
         }
         // otherwise run application in console
         else{
-            ConsoleApplication.runConsoleApplication(args);
+            ApiFactory apiFactory = new ApiFactory();
+            BatchContractExtractorApi batchContractExtractorApi = apiFactory.getBatchContractExtractorApi();
+            BatchContractComparatorApi batchContractComparatorApi = apiFactory.getBatchContractComparatorApi();
+            ConsoleApplication consoleApplication = new ConsoleApplication(batchContractExtractorApi, batchContractComparatorApi);
+            consoleApplication.runConsoleApplication(args);
         }
+    }
+
+
+    /**
+     * This methods overrides method of JavaFX and is used to start GUI version of application.
+     *
+     * @param _stage    Stage of main application
+     */
+    @Override
+    public void start(Stage _stage) {
+
+        stage = _stage;
+        prepareWindow();
+    }
+
+
+    /**
+     * Prepares main window of the application. It sets its title, icon, size etc. It also prepares on close and action,
+     * controller and presentation management.
+     */
+    private void prepareWindow(){
+
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(ResourceHandler.getProperties()
+                .getString("sceneFileName")));
+        loader.setResources(ResourceHandler.getLocalization());
+
+        try {
+            Parent root = loader.load();
+
+            // set window title
+            stage.setTitle(ResourceHandler.getLocaleString("windowTitle"));
+
+            // set window icon
+            stage.getIcons().add(new Image(ResourceHandler.getProperties().getString("icon")));
+
+            // set default window size
+            double height = Double.parseDouble(ResourceHandler.getProperties().getString("mainWindowWidth"));
+            double width = Double.parseDouble(ResourceHandler.getProperties().getString("mainWindowHeight"));
+            stage.setHeight(height);
+            stage.setWidth(width);
+            stage.setMinHeight(height);
+            stage.setMinWidth(width);
+
+            // attach scene
+            scene = new Scene(root);
+            stage.setScene(scene);
+
+            // set on close action
+            stage.setOnCloseRequest(e -> {
+                Platform.exit();
+                System.exit(0);
+            });
+
+            // prepare presentation model
+            applicationData = new ApplicationData();
+
+            // prepare controller
+            Controller controller = loader.getController();
+            controller.initController(stage);
+
+            stage.show();
+
+            // init scenes of application tabs
+            applicationData.getExtractorApplicationTab().initScene();
+            applicationData.getComparatorApplicationTab().initScene();
+
+        } catch (IOException e) {
+
+            logger.error(ResourceHandler.getLocaleString("errorCannotLoadMainWindow"));
+            logger.error(e.getMessage());
+            closeApplication(1);
+        }
+    }
+
+
+    /**
+     * Closes the whole application by returning given number.
+     *
+     * @param returnValue   Error value (0 correct end)
+     */
+    public static void closeApplication(int returnValue) {
+        
+        Platform.exit();
+        System.exit(returnValue);
+    }
+
+
+    public static ApplicationData getApplicationData() {
+        return applicationData;
+    }
+
+    public static Scene getMainScene() {
+        return scene;
     }
 }

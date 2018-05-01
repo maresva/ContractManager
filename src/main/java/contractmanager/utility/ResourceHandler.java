@@ -15,12 +15,13 @@ import java.util.ResourceBundle;
  */
 public class ResourceHandler {
 
-    /** Log4j for this class */
+    /** Log4j logger for this class */
     private static final Logger logger = Logger.getLogger(ResourceHandler.class);
 
     /** ResourceBundle with properties */
     private static final ResourceBundle properties = ResourceBundle.getBundle("contractmanager");
 
+    /** ResourceBundle with localization Strings */
     public static final ResourceBundle localization = ResourceBundle.getBundle("contractmanager",
             new Locale("en", "EN"));
 
@@ -37,7 +38,7 @@ public class ResourceHandler {
      * @param arguments     Optional arguments used as a variables in message
      * @return              String with message with replaced variables if there were any
      */
-    public static String getMessage(String resource, Object ... arguments){
+    public static String getLocaleString(String resource, Object ... arguments){
 
         String message = "";
 
@@ -56,5 +57,9 @@ public class ResourceHandler {
     // Getters
     public static ResourceBundle getProperties() {
         return properties;
+    }
+
+    public static ResourceBundle getLocalization() {
+        return localization;
     }
 }

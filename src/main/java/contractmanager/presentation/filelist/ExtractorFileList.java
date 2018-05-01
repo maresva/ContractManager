@@ -1,14 +1,18 @@
-package contractmanager.filelist;
+package contractmanager.presentation.filelist;
 
-import contractmanager.applicationTab.ApplicationTab;
+import contractmanager.presentation.applicationtab.LoadingWindow;
+import contractmanager.utility.ResourceHandler;
+import contractmanager.utility.Utils;
 import contractmanager.view.ContractManager;
-import cz.zcu.kiv.contractparser.utils.IOServices;
 import cz.zcu.kiv.contractparser.model.JavaFile;
+import cz.zcu.kiv.contractparser.utils.IOServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
 import org.controlsfx.control.CheckListView;
 
@@ -16,20 +20,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileList {
+public class ExtractorFileList implements FileList {
 
-    private LoadingWindow loadingWindow;
+    private static final String CLV_SELECTOR = "#clvFilesExtractor";
+
     private CheckListView checkListView;
-    private ApplicationTab applicationTab;
 
-    
-    public FileList(LoadingWindow loadingWindow) {
+    private List<JavaFile> files;
 
-        this.loadingWindow = loadingWindow;
-
-        // get CheckListView with list of java files names
-        checkListView = (CheckListView) ContractManager.scene.lookup("#clv_files");
+    public ExtractorFileList() {
+        super();
+        //this.checkListView = (CheckListView) Utils.lookup(CLV_SELECTOR, ContractManager.getMainScene());
+        this.files = new ArrayList<>();
     }
+
 
 
     /**
@@ -41,8 +45,10 @@ public class FileList {
      */
     public void addFiles(List<File> inputFiles, File selectedDirectory) {
 
+        LoadingWindow loadingWindow = ContractManager.getApplicationData().getExtractorApplicationTab().getLoadingWindow();
+
         // get progress bar
-        ProgressBar pb_loading = (ProgressBar) loadingWindow.getLoadingScene().lookup("#pb_loading");
+        ProgressBar pb_loading = (ProgressBar) loadingWindow.getLoadingScene().lookup("#pbLoadingBar");
 
         // start task
         Task<Boolean> task = new Task<Boolean>() {
@@ -64,7 +70,7 @@ public class FileList {
 
                 for(File file : files){
                     if (!isCancelled()) {
-                        if (ContractManager.extractorDataModel.addFile(file)) {
+                        if (addFile(file)) {
                             addedFiles++;
 
                             // update progress bar
@@ -75,8 +81,6 @@ public class FileList {
                         break;
                     }
                 }
-
-                ContractManager.consoleWriter.writeNumberOfAddedFiles(addedFiles);
 
                 return true;
             }
@@ -102,16 +106,72 @@ public class FileList {
     }
 
 
-    public void removeFiles() {
+    private boolean addFile(File newFile) {
+
+        // check whether this file is not already present
+        boolean found = false;
+        for(JavaFile javaFile : files) {
+
+            if(javaFile == null){
+                System.out.println("javaFile je NULL");
+                return false;
+            }
+
+            if(newFile == null) {
+                System.out.println("newFile je NULL");
+                return false;
+            }
+
+            if(javaFile.getFullPath().equals(newFile.getAbsolutePath())) {
+                found = true;
+                break;
+            }
+        }
+
+
+        // if the file is not in the list yet - add it
+        if (!found) {
+            JavaFile javaFile = ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi().retrieveContracts(newFile, true);
+
+            if(javaFile != null) {
+                files.add(javaFile);
+                ContractManager.getApplicationData().getExtractorApplicationTab().getGlobalStatistics().mergeStatistics(javaFile.getJavaFileStatistics());
+
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
+
+    public int removeFiles() {
 
         List<Integer> checkedIndexes = getSelected();
 
         // remove selected files
-        int deletedFiles = ContractManager.extractorDataModel.removeFiles(checkedIndexes);
+        int deletedFiles = 0;
 
-        ContractManager.consoleWriter.writeNumberOfDeletedFiles(deletedFiles);
+        for(int index : checkedIndexes){
+
+            int newIndex = index - deletedFiles;
+
+            if(newIndex < files.size()) {
+
+                ContractManager.getApplicationData().getExtractorApplicationTab().getGlobalStatistics()
+                        .detachStatistics(files.get(newIndex).getJavaFileStatistics());
+                files.remove(newIndex);
+                deletedFiles++;
+            }
+        }
 
         updateList();
+
+        return deletedFiles;
     }
 
 
@@ -129,7 +189,21 @@ public class FileList {
         return checkedIndexes;
     }
 
-    
+
+    public List<JavaFile> getSelectedFiles() {
+
+        List<JavaFile> javaFiles = new ArrayList<>();
+
+        for(int i = 0 ; i < checkListView.getItems().size() ; i++ ) {
+            if(checkListView.getCheckModel().isChecked(i)) {
+                javaFiles.add(files.get(i));
+            }
+        }
+
+        return javaFiles;
+    }
+
+
     /**
      * This method will update file list when called. It is called whenever some change occurs such as adding or
      * removing file.
@@ -137,12 +211,9 @@ public class FileList {
      */
     public void updateList() {
 
-        ContractManager.extractorDataModel.updateShortPath();
+        updateShortPath();
 
-        checkListView = (CheckListView) ContractManager.scene.lookup("#clv_files");
-
-        // get current list with JavaFiles
-        List<JavaFile> files = ContractManager.extractorDataModel.getFiles();
+        checkListView = (CheckListView) ContractManager.scene.lookup(CLV_SELECTOR);
 
         // update list of files in checkListView
         final ObservableList<String> fileItems = FXCollections.observableArrayList();
@@ -160,15 +231,15 @@ public class FileList {
         updateSelected(numberOfFilesTotal, numberOfFilesChecked);
 
         // if there are no files - show label informing about empty list and disable select all check box
-        Label lbl_list_empty = (Label) ContractManager.scene.lookup("#lbl_list_empty");
-        Button btn_select_all = (Button) ContractManager.scene.lookup("#btn_select_all");
+        Label lblExtractorListEmpty = (Label) ContractManager.scene.lookup("#lblExtractorListEmpty");
+        Button btn_select_all = (Button) ContractManager.scene.lookup("#btnExtractorSelectAll");
 
         if(files.size() > 0){
-            lbl_list_empty.setVisible(false);
+            lblExtractorListEmpty.setVisible(false);
             btn_select_all.setDisable(false);
         }
         else {
-            lbl_list_empty.setVisible(true);
+            lblExtractorListEmpty.setVisible(true);
             btn_select_all.setDisable(true);
         }
 
@@ -184,23 +255,23 @@ public class FileList {
             }
         });
 
-
         // update details when item is highlighted using mouse click
-        checkListView.setOnMouseClicked(event -> applicationTab.updateDetails());
+        checkListView.setOnMouseClicked(event -> ContractManager.getApplicationData().getExtractorApplicationTab()
+                .updateFileDetails());
 
         // update details when item is highlighted using arrow keys
         checkListView.setOnKeyReleased(event -> {
             KeyCode keyCode = event.getCode();
             if(keyCode.isArrowKey()) {
-                applicationTab.updateDetails();
+                ContractManager.getApplicationData().getExtractorApplicationTab().updateFileDetails();
             }
         });
 
-        applicationTab.updateGlobalStatistics();
+        ContractManager.getApplicationData().getExtractorApplicationTab().updateGlobalStatistics();
     }
 
 
-    
+
 
     /**
      * This method updates (De)select All button. If there are some unselected files it has Select All label.
@@ -209,34 +280,41 @@ public class FileList {
      * @param numberOfFilesTotal        Total number of files
      * @param numberOfFilesChecked      Number of selected files
      */
-    public void updateSelected(int numberOfFilesTotal, int numberOfFilesChecked) {
+    private void updateSelected(int numberOfFilesTotal, int numberOfFilesChecked) {
 
         // update Select all check box (is checked only if all files are selected)
-        Button btn_select_all = (Button) ContractManager.scene.lookup("#btn_select_all");
+        Button btn_select_all = (Button) ContractManager.scene.lookup("#btnExtractorSelectAll");
 
-        Button btn_remove_files = (Button) ContractManager.scene.lookup("#btn_remove_files");
-        Button btn_export_files = (Button) ContractManager.scene.lookup("#btn_export_files");
+        Button btn_remove_files = (Button) ContractManager.scene.lookup("#btnExtractorRemoveFiles");
+        Button btn_export_files = (Button) ContractManager.scene.lookup("#btnExportFilesExtractor");
 
         if(numberOfFilesTotal-numberOfFilesChecked == 0){
-            btn_select_all.setText(ContractManager.localization.getString("buttonDeselectAll"));
+            btn_select_all.setText(ResourceHandler.getLocaleString("buttonDeselectAll"));
             btn_remove_files.setDisable(false);
             btn_export_files.setDisable(false);
         }
         else if(numberOfFilesChecked > 0){
-            btn_select_all.setText(ContractManager.localization.getString("buttonSelectAll"));
+            btn_select_all.setText(ResourceHandler.getLocaleString("buttonSelectAll"));
             btn_remove_files.setDisable(false);
             btn_export_files.setDisable(false);
         }
         else{
-            btn_select_all.setText(ContractManager.localization.getString("buttonSelectAll"));
+            btn_select_all.setText(ResourceHandler.getLocaleString("buttonSelectAll"));
             btn_remove_files.setDisable(true);
             btn_export_files.setDisable(true);
         }
 
         // update info label about number of selected files
-        Label lbl_selected = (Label) ContractManager.scene.lookup("#lbl_selected");
-        lbl_selected.setText(ContractManager.localization.getString("labelSelectedFiles") + ": "
+        Label lbl_selected = (Label) ContractManager.scene.lookup("#lblExtractorSelected");
+        lbl_selected.setText(ResourceHandler.getLocaleString("labelSelectedFiles") + ": "
                 + numberOfFilesChecked + " / " + numberOfFilesTotal);
+    }
+
+
+    private void updateShortPath() {
+
+        ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi()
+                .updateShortPathOfJavaFiles(files);
     }
 
 
@@ -246,9 +324,9 @@ public class FileList {
      */
     public void selectAll() {
 
-        Button btn_select_all = (Button) ContractManager.scene.lookup("#btn_select_all");
+        Button btnExtractorSelectAll = (Button) ContractManager.scene.lookup("#btnExtractorSelectAll");
 
-        if(btn_select_all.getText().equals(ContractManager.localization.getString("buttonSelectAll"))) {
+        if(btnExtractorSelectAll.getText().equals(ResourceHandler.getLocaleString("buttonSelectAll"))) {
             checkListView.getCheckModel().checkAll();
         }
         else{
@@ -256,12 +334,11 @@ public class FileList {
         }
     }
 
+    public List<JavaFile> getFiles() {
+        return files;
+    }
 
     public CheckListView getCheckListView() {
         return checkListView;
-    }
-
-    public void setApplicationTab(ApplicationTab applicationTab) {
-        this.applicationTab = applicationTab;
     }
 }

@@ -1,5 +1,7 @@
-package contractmanager.filelist;
+package contractmanager.presentation.applicationtab;
 
+import contractmanager.presentation.filelist.FileList;
+import contractmanager.utility.ResourceHandler;
 import contractmanager.view.ContractManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,18 +17,19 @@ public class LoadingWindow {
     private Stage loadingStage;
     private Scene loadingScene;
 
-    public LoadingWindow(){
+    private String sceneFile;
+
+    public LoadingWindow(String sceneFile){
+        this.sceneFile = sceneFile;
     }
 
     /**
-     * When loading of files is started - loading window is displayed for user. It shows progress of the aciton
+     * When loading of files is started - loading window is displayed for user. It shows progress of the action
      * on progress bar which is periodically updated.
      */
     public void show() {
-
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
-                ContractManager.properties.getString("sceneLoadingFileName")));
-        loader.setResources(ContractManager.localization);
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(sceneFile));
+        loader.setResources(ResourceHandler.getLocalization());
 
         try {
             Parent root = loader.load();
@@ -54,10 +57,20 @@ public class LoadingWindow {
 
 
     public Stage getLoadingStage() {
+
+        if(loadingStage == null){
+            show();
+        }
+
         return loadingStage;
     }
 
     public Scene getLoadingScene() {
+
+        if(loadingScene == null){
+            show();
+        }
+
         return loadingScene;
     }
 }

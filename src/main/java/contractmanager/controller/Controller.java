@@ -1,8 +1,7 @@
 package contractmanager.controller;
 
-import contractmanager.applicationTab.ApplicationTab;
-import contractmanager.filelist.FileList;
-import contractmanager.filelist.LoadingWindow;
+import contractmanager.presentation.applicationtab.LoadingWindow;
+import contractmanager.view.ContractManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,12 +15,6 @@ public class Controller {
     /** Main stage of application */
     private Stage mainStage;
 
-    /** Tab for extractor part of application */
-    private ApplicationTab extractorApplicationTab;
-
-    /** Loading window enables showing and hiding progress bar on actions */
-    private LoadingWindow loadingWindow;
-
     /** Manipulates with files especially work with file or folder choosers */
     private FileHandler fileHandler;
 
@@ -33,9 +26,6 @@ public class Controller {
      */
     public void initController(Stage mainStage) {
         this.mainStage = mainStage;
-        this.loadingWindow = new LoadingWindow();
-        this.extractorApplicationTab = new ApplicationTab(new FileList(loadingWindow));
-        this.extractorApplicationTab.getFileList().setApplicationTab(extractorApplicationTab);
         this.fileHandler = new FileHandler();
     }
 
@@ -51,8 +41,9 @@ public class Controller {
 
         List<File> files = fileHandler.chooseFiles(mainStage);
         if (files != null) {
-            loadingWindow.show();
-            extractorApplicationTab.getFileList().addFiles(files, null);
+            ContractManager.getApplicationData().getExtractorApplicationTab().getLoadingWindow().show();
+
+            ContractManager.getApplicationData().getExtractorApplicationTab().getFileList().addFiles(files, null);
         }
     }
 
@@ -70,8 +61,8 @@ public class Controller {
         File selectedDirectory = fileHandler.chooseFolder(mainStage);
 
         if(selectedDirectory != null) {
-            loadingWindow.show();
-            extractorApplicationTab.getFileList().addFiles(null, selectedDirectory);
+            ContractManager.getApplicationData().getExtractorApplicationTab().getLoadingWindow().show();
+            ContractManager.getApplicationData().getExtractorApplicationTab().getFileList().addFiles(null, selectedDirectory);
         }
     }
 
@@ -84,7 +75,8 @@ public class Controller {
      */
     @FXML
     public void extractorRemoveFiles(ActionEvent event) {
-        extractorApplicationTab.getFileList().removeFiles();
+
+        ContractManager.getApplicationData().getExtractorApplicationTab().getFileList().removeFiles();
     }
 
 
@@ -96,7 +88,8 @@ public class Controller {
      */
     @FXML
     private void extractorSelectAll(ActionEvent event) {
-        extractorApplicationTab.getFileList().selectAll();
+
+        ContractManager.getApplicationData().getExtractorApplicationTab().getFileList().selectAll();
     }
 
 
@@ -109,7 +102,7 @@ public class Controller {
      */
     @FXML
     public void extractorShowDetails(ActionEvent event){
-        extractorApplicationTab.showDetails();
+        ContractManager.getApplicationData().getExtractorApplicationTab().showDetailsWindow();
     }
 
 
@@ -121,8 +114,9 @@ public class Controller {
      */
     @FXML
     public void extractorExportToJSON(ActionEvent event){
-        fileHandler.exportToJSON(mainStage, extractorApplicationTab.getFileList());
+        fileHandler.exportJavaFilesToJSON(mainStage, ContractManager.getApplicationData().getExtractorApplicationTab().getFileList());
     }
+
 
     /**
      * This action closes the application.
@@ -133,5 +127,47 @@ public class Controller {
     public void closeApplication(ActionEvent event) {
         Platform.exit();
         System.exit(0);
+    }
+
+
+    public void toggleMinJson(ActionEvent event) {
+         
+    }
+
+    public void comparatorShowDetails(ActionEvent event) {
+        System.out.println("TODO show Details");
+    }
+
+    @FXML
+    public void comparatorAddDirectory1(ActionEvent event) {
+
+        File selectedDirectory = fileHandler.chooseFolder(mainStage);
+
+        if(selectedDirectory != null) {
+            ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().selectDirectory(
+                    selectedDirectory, true);
+        }
+    }
+
+    @FXML
+    public void comparatorAddDirectory2(ActionEvent event) {
+
+        File selectedDirectory = fileHandler.chooseFolder(mainStage);
+
+        if(selectedDirectory != null) {
+            ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().selectDirectory(
+                    selectedDirectory, false);
+        }
+    }
+
+    @FXML
+    public void comparatorCompare(ActionEvent event) {
+
+        ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().compareFolders();
+    }
+
+    public void comparatorSelectAll(ActionEvent event) {
+
+        ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().selectAll();
     }
 }

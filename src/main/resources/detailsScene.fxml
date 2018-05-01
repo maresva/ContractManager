@@ -1,115 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="644.0" xmlns="http://javafx.com/javafx/8.0.161" xmlns:fx="http://javafx.com/fxml/1" fx:controller="contractmanager.controller.Controller">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="644.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="contractmanager.controller.Controller">
    <children>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.24628450106157113" orientation="VERTICAL" prefHeight="473.0" prefWidth="644.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-            <Button alignment="CENTER" mnemonicParsing="false" text="Export to JSON" textAlignment="CENTER">
-               <graphic>
-                  <FontAwesomeIconView glyphName="EXTERNAL_LINK" size="18.0" textAlignment="RIGHT" />
-               </graphic>
-            </Button>
-            <Button alignment="CENTER" layoutX="10.0" layoutY="12.0" mnemonicParsing="false" text="Export Statistics" textAlignment="CENTER">
-               <graphic>
-                  <FontAwesomeIconView glyphName="TABLE" size="18.0" textAlignment="RIGHT" />
-               </graphic>
-            </Button>
-        </items>
-      </ToolBar>
-      <SplitPane dividerPositions="0.30148619957537154" orientation="VERTICAL" prefHeight="473.0" prefWidth="644.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
-        <items>
-          <AnchorPane minHeight="100.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <AnchorPane maxHeight="180.0" minHeight="120.0" minWidth="0.0" prefHeight="120.0">
                <children>
-                  <SplitPane dividerPositions="0.5" prefHeight="127.0" prefWidth="642.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <items>
-                      <AnchorPane minHeight="0.0" minWidth="300.0" prefHeight="160.0" prefWidth="100.0">
-                           <children>
-                              <GridPane id="grid_details" prefWidth="317.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="0.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints maxHeight="63.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
-                                 <children>
-                                    <Label text="%labelFilename">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label id="lbl_filename_value" GridPane.columnIndex="1" />
-                                    <Label text="%labelPath" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label id="lbl_path_value" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                 </children>
-                              </GridPane>
-                              <Label alignment="CENTER" text="%labelFileDetails" textAlignment="CENTER" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                        </AnchorPane>
-                      <AnchorPane minHeight="0.0" minWidth="300.0" prefHeight="160.0" prefWidth="100.0">
-                           <children>
-                              <GridPane id="grid_details" prefHeight="60.0" prefWidth="285.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="0.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints maxHeight="63.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
-                                 <children>
-                                    <Label text="%labelNumberOfClasses">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label id="lbl_number_classes_value" GridPane.columnIndex="1" />
-                                    <Label text="%labelNumberOfMethods" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label id="lbl_number_methods_value" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                 </children>
-                              </GridPane>
-                              <Label alignment="CENTER" text="%labelFileStatistics" textAlignment="CENTER" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                              </Label>
-                              <Separator layoutX="19.0" layoutY="108.0" prefHeight="3.0" prefWidth="112.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="70.0" />
-                           </children></AnchorPane>
-                    </items>
-                  </SplitPane>
+                  <GridPane id="gridDetails" layoutX="24.0" layoutY="35.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="40.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="%labelNumberOfClasses">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label text="%labelNumberOfMethods" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label text="%labelNumberOfMethodsWithContracts" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label text="%labelNumberOfContracts" GridPane.columnIndex="2">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label id="lblClassesValue" GridPane.columnIndex="1" />
+                        <Label id="lblMethodsValue" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label id="lblMethodsWithValue" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label id="lblContractsValue" GridPane.columnIndex="3" />
+                     </children>
+                  </GridPane>
+                  <Label text="%labelFile" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label id="lblFileValue" layoutX="120.0" layoutY="32.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="10.0" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="100.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <TextArea id="ta_details" editable="false" prefHeight="264.0" wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
+                  <TabPane layoutX="20.0" layoutY="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <tabs>
+                        <Tab closable="false" text="Contract Tree">
+                           <content>
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <TreeView id="tvContractDetails" layoutX="14.0" layoutY="6.0" prefHeight="211.0" prefWidth="602.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
+                        <Tab closable="false" text="JSON">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TextArea id="taJson" editable="false" prefHeight="211.0" prefWidth="602.0" wrapText="true" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                     </tabs>
+                  </TabPane>
                </children>
             </AnchorPane>
         </items>

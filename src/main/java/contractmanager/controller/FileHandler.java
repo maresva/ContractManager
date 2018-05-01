@@ -1,6 +1,7 @@
 package contractmanager.controller;
 
-import contractmanager.filelist.FileList;
+import contractmanager.presentation.filelist.ExtractorFileList;
+import contractmanager.utility.ResourceHandler;
 import contractmanager.view.ContractManager;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -22,23 +23,26 @@ public class FileHandler {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(ContractManager.localization.getString("fileChooserFilter"),
+                new FileChooser.ExtensionFilter(ResourceHandler.getLocaleString("fileChooserFilter"),
                         "*.java","*.class"));
 
         return fileChooser.showOpenMultipleDialog(stage);
     }
     
 
-    public void exportToJSON(Stage stage, FileList fileList){
+    public int exportJavaFilesToJSON(Stage stage, ExtractorFileList fileList){
 
         // display directory chooser
         File selectedDirectory = chooseFolder(stage);
 
+        int exportedFiles = 0;
+
         if(selectedDirectory != null) {
 
-            int exportedFiles = ContractManager.extractorDataModel.exportToJSON(fileList.getSelected(), selectedDirectory);
-
-            ContractManager.consoleWriter.writeNumberOfExportedFiles(exportedFiles);
+            exportedFiles = ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi()
+                    .exportJavaFilesToJson(fileList.getSelectedFiles(), selectedDirectory, true);
         }
+
+        return exportedFiles;
     }
 }

@@ -1,8 +1,8 @@
 package contractmanager.utility;
 
-import cz.zcu.kiv.contractparser.ContractComparatorApi;
-import cz.zcu.kiv.contractparser.ContractExtractorApi;
-import javafx.application.Platform;
+import contractmanager.view.ContractManager;
+import cz.zcu.kiv.contractparser.api.BatchContractComparatorApi;
+import cz.zcu.kiv.contractparser.api.BatchContractExtractorApi;
 
 import java.io.File;
 
@@ -14,12 +14,25 @@ import java.io.File;
  * */
 public class ConsoleApplication {
 
+    /** API providing batch contract extractor methods */
+    private BatchContractExtractorApi batchContractExtractorApi;
+
+    /** API providing batch contract comparator methods */
+    private BatchContractComparatorApi batchContractComparatorApi;
+
+
+    public ConsoleApplication(BatchContractExtractorApi contractExtractorApi, BatchContractComparatorApi batchContractComparatorApi) {
+        this.batchContractExtractorApi = contractExtractorApi;
+        this.batchContractComparatorApi = batchContractComparatorApi;
+    }
+    
+
     /**
      * This method runs a console application command based on input arguments.
      *
      * @param args  Application input arguments
      */
-    public static void runConsoleApplication(String[] args){
+    public void runConsoleApplication(String[] args){
 
         // first argument represents command to be executed
         // it can be either -h or --help for Help command, -e for Extractor command or -c for Comparator command
@@ -28,7 +41,7 @@ public class ConsoleApplication {
             args[0] = args[0].toLowerCase();
         }
         else{
-            endWithError(ResourceHandler.getMessage("consoleAppErrorFirstParamIsNull"), true);
+            endWithError(ResourceHandler.getLocaleString("consoleAppErrorFirstParamIsNull"), true);
         }
 
         if(ResourceHandler.getProperties().getString("consoleAppCommandHelpShort").compareTo(args[0]) == 0 ||
@@ -43,11 +56,10 @@ public class ConsoleApplication {
             comparatorCommand(args);
         }
         else{
-            endWithError(ResourceHandler.getMessage("consoleAppErrorFirstParamUnknown", args[0]), true);
+            endWithError(ResourceHandler.getLocaleString("consoleAppErrorFirstParamUnknown", args[0]), true);
         }
 
-        Platform.exit();
-        System.exit(0);
+        ContractManager.closeApplication(0);
     }
 
 
@@ -63,12 +75,12 @@ public class ConsoleApplication {
      *
      * @param args  Application input arguments
      */
-    private static void comparatorCommand(String[] args) {
+    private void comparatorCommand(String[] args) {
 
         if(args.length >= 4) {
 
             if (args.length > 7) {
-                endWithError(ResourceHandler.getMessage("consoleAppErrorComparatorWrongNumParamsMax"), true);
+                endWithError(ResourceHandler.getLocaleString("consoleAppErrorComparatorWrongNumParamsMax"), true);
             }
 
             // get first input folder
@@ -94,7 +106,7 @@ public class ConsoleApplication {
                     args[i] = args[i].toLowerCase();
                 }
                 else{
-                    endWithError(ResourceHandler.getMessage("consoleAppErrorComparatorFlagUnknown", args[i]), true);
+                    endWithError(ResourceHandler.getLocaleString("consoleAppErrorComparatorFlagUnknown", args[i]), true);
                 }
 
                 if(ResourceHandler.getProperties().getString("consoleAppFlagReportOnlyContractChanges").compareTo(args[i]) == 0){
@@ -107,15 +119,16 @@ public class ConsoleApplication {
                     minJson = true;
                 }
                 else{
-                    endWithError(ResourceHandler.getMessage("consoleAppErrorComparatorFlagUnknown", args[i]), true);
+                    endWithError(ResourceHandler.getLocaleString("consoleAppErrorComparatorFlagUnknown", args[i]), true);
                 }
             }
 
-            ContractComparatorApi.compareJavaFoldersAndExportToJson(firstInputFolder, secondInputFolder, !removeEqual,
+
+            batchContractComparatorApi.compareJavaFoldersAndExportToJson(firstInputFolder, secondInputFolder, !removeEqual,
                     !reportOnlyContractChange, outputFolder, !minJson);
         }
         else{
-            endWithError(ResourceHandler.getMessage("consoleAppErrorComparatorWrongNumParamsMin"), true);
+            endWithError(ResourceHandler.getLocaleString("consoleAppErrorComparatorWrongNumParamsMin"), true);
         }
 
     }
@@ -131,12 +144,12 @@ public class ConsoleApplication {
      *
      * @param args  Application input arguments
      */
-    private static void extractorCommand(String[] args) {
+    private void extractorCommand(String[] args) {
         
         if(args.length >= 3) {
 
             if(args.length > 5){
-                endWithError(ResourceHandler.getMessage("consoleAppErrorExtractorWrongNumParamsMax"), true);
+                endWithError(ResourceHandler.getLocaleString("consoleAppErrorExtractorWrongNumParamsMax"), true);
             }
 
             // get input folder
@@ -156,7 +169,7 @@ public class ConsoleApplication {
                     args[i] = args[i].toLowerCase();
                 }
                 else{
-                    endWithError(ResourceHandler.getMessage("consoleAppErrorExtractorFlagUnknown", args[i]), true);
+                    endWithError(ResourceHandler.getLocaleString("consoleAppErrorExtractorFlagUnknown", args[i]), true);
                 }
 
                 if(ResourceHandler.getProperties().getString("consoleAppFlagMinJson").compareTo(args[i]) == 0){
@@ -166,16 +179,16 @@ public class ConsoleApplication {
                     removeNonContractObjects = true;
                 }
                 else{
-                    endWithError(ResourceHandler.getMessage("consoleAppErrorExtractorFlagUnknown", args[i]), true);
+                    endWithError(ResourceHandler.getLocaleString("consoleAppErrorExtractorFlagUnknown", args[i]), true);
                 }
             }
 
-            ContractExtractorApi.retrieveContractsFromFolderExportToJson(inputFolder, outputFolder, !minJson,
+            batchContractExtractorApi.retrieveContractsFromFolderExportToJson(inputFolder, outputFolder, !minJson,
                     removeNonContractObjects);
 
         }
         else{
-            endWithError(ResourceHandler.getMessage("consoleAppErrorExtractorWrongNumParamsMin"), true);
+            endWithError(ResourceHandler.getLocaleString("consoleAppErrorExtractorWrongNumParamsMin"), true);
         }
     }
 
@@ -185,13 +198,13 @@ public class ConsoleApplication {
      *
      * @param args  Application input arguments
      */
-    private static void helpCommand(String[] args) {
+    private void helpCommand(String[] args) {
 
         if(args.length == 1){
-            System.out.println(ResourceHandler.getMessage("consoleAppHelp"));
+            System.out.println(ResourceHandler.getLocaleString("consoleAppHelp"));
         }
         else{
-            endWithError(ResourceHandler.getMessage("consoleAppErrorOneParamHelp"), true);
+            endWithError(ResourceHandler.getLocaleString("consoleAppErrorOneParamHelp"), true);
         }
     }
 
@@ -203,16 +216,15 @@ public class ConsoleApplication {
      * @param errorMessage  Error message that should be displayed
      * @param showHelp      If help message should be printed
      */
-    private static void endWithError(String errorMessage, boolean showHelp) {
+    private void endWithError(String errorMessage, boolean showHelp) {
         
-        System.out.println(ResourceHandler.getMessage("consoleAppError") + " " + errorMessage + "\n");
+        System.out.println(ResourceHandler.getLocaleString("consoleAppError") + " " + errorMessage + "\n");
 
         if(showHelp){
-            System.out.println(ResourceHandler.getMessage("consoleAppHelp"));
+            System.out.println(ResourceHandler.getLocaleString("consoleAppHelp"));
         }
 
-        Platform.exit();
-        System.exit(1);
+        ContractManager.closeApplication(1);
     }
 
 
@@ -223,23 +235,23 @@ public class ConsoleApplication {
      * @param folderName    Name of folder (path) to be checked
      * @param createFolder  Whether should be created non existing folders or not
      */
-    private static void checkFolder(String folderName, boolean createFolder){
+    private void checkFolder(String folderName, boolean createFolder){
 
         File folder = new File(folderName);
 
         if(folder.isFile()){
-            endWithError(ResourceHandler.getMessage("consoleAppErrorFileNotFolder", folderName), false);
+            endWithError(ResourceHandler.getLocaleString("consoleAppErrorFileNotFolder", folderName), false);
         }
 
         if(!folder.exists()){
 
             if(createFolder){
                 if(!folder.mkdirs()){
-                    endWithError(ResourceHandler.getMessage("consoleAppErrorFolderNotCreated", folderName), false);
+                    endWithError(ResourceHandler.getLocaleString("consoleAppErrorFolderNotCreated", folderName), false);
                 }
             }
             else{
-                endWithError(ResourceHandler.getMessage("consoleAppErrorFolderNotExist", folderName), false);
+                endWithError(ResourceHandler.getLocaleString("consoleAppErrorFolderNotExist", folderName), false);
             }
         }
     }
