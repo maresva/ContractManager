@@ -49,8 +49,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
 
         ToggleButton btnToggleMinJsonComparator = (ToggleButton) Utils.lookup("#btnToggleMinJsonComparator",
                 ContractManager.getMainScene());
-        ToggleButton btnToggleShowNonContractObjectsComparator = (ToggleButton) Utils.lookup(
-                "#btnToggleShowNonContractObjectsComparator", ContractManager.getMainScene());
+        //ToggleButton btnToggleShowNonContractObjectsComparator = (ToggleButton) Utils.lookup("#btnToggleShowNonContractObjectsComparator", ContractManager.getMainScene());
         ToggleButton btnToggleReportOnlyContractChanges = (ToggleButton) Utils.lookup(
                 "#btnToggleReportOnlyContractChanges", ContractManager.getMainScene());
         ToggleButton btnToggleReportEqual = (ToggleButton) Utils.lookup(
@@ -65,12 +64,13 @@ public class ComparatorApplicationTab extends ApplicationTab {
             btnToggleMinJsonComparator.setSelected(false);
         }
 
+        /*
         if(settings.isShowNonContractObjects()){
             btnToggleShowNonContractObjectsComparator.setSelected(true);
         }
         else{
             btnToggleShowNonContractObjectsComparator.setSelected(false);
-        }
+        }*/
 
         if(settings.isReportOnlyContractChanges()){
             btnToggleReportOnlyContractChanges.setSelected(true);

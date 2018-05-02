@@ -344,10 +344,6 @@
                                  <tooltip>
                                     <Tooltip text="%tooltipMinJson" />
                                  </tooltip></ToggleButton>
-                              <ToggleButton id="btnToggleShowNonContractObjectsComparator" focusTraversable="false" mnemonicParsing="false" text="%toggleShowNonContractObjects">
-                                 <tooltip>
-                                    <Tooltip text="%tooltipShowNonContractObjects" />
-                                 </tooltip></ToggleButton>
                               <ToggleButton id="btnToggleReportOnlyContractChanges" focusTraversable="false" mnemonicParsing="false" text="%toggleReportOnlyContractChanges">
                                  <tooltip>
                                     <Tooltip text="%tooltipReportOnlyContractChanges" />
