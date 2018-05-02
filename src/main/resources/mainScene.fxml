@@ -175,8 +175,8 @@
                                                                   <Font name="System Bold" size="12.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label id="lblExtractorStatsFilesValue" text="0" GridPane.columnIndex="1" />
-                                                            <Label id="lblExtractorStatsClassesValue" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <Label id="lblExtractorStatsFilesValue" text="-" GridPane.columnIndex="1" />
+                                                            <Label id="lblExtractorStatsClassesValue" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                             <Label text="%labelNumberOfMethods" GridPane.rowIndex="2">
                                                                <font>
                                                                   <Font name="System Bold" size="12.0" />
@@ -197,9 +197,9 @@
                                                                   <Font name="System Bold" size="12.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label id="lblExtractorStatsMethodsValue" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <Label id="lblExtractorStatsMethodsWithValue" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                            <Label id="lblExtractorStatsContractsValue" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <Label id="lblExtractorStatsMethodsValue" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <Label id="lblExtractorStatsMethodsWithValue" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <Label id="lblExtractorStatsContractsValue" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                          </children>
                                                       </GridPane>
                                                    </children>
@@ -231,7 +231,10 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label id="lblFileValueExtractor" layoutX="110.0" layoutY="22.0" text="%labelFileDefaultValue" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="30.0" />
+                                                      <Label id="lblFileValueExtractor" layoutX="110.0" layoutY="22.0" text="%labelFileDefaultValue" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="30.0">
+                                                         <font>
+                                                            <Font name="System Italic" size="12.0" />
+                                                         </font></Label>
                                                    </children>
                                                 </AnchorPane>
                                             </items>
@@ -488,7 +491,10 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label id="lblComparatorFileDetailsValue" layoutX="110.0" layoutY="22.0" text="%labelFileDefaultValue" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="30.0" />
+                                                      <Label id="lblComparatorFileDetailsValue" layoutX="110.0" layoutY="22.0" text="%labelFileDefaultValue" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="30.0">
+                                                         <font>
+                                                            <Font name="System Italic" size="12.0" />
+                                                         </font></Label>
                                                    </children>
                                                 </AnchorPane>
                                              </items>

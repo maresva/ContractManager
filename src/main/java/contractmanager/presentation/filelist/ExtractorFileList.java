@@ -272,7 +272,7 @@ public class ExtractorFileList implements FileList {
             }
         });
 
-        ContractManager.getApplicationData().getExtractorApplicationTab().updateGlobalStatistics();
+        ContractManager.getApplicationData().getExtractorApplicationTab().updateGlobalStatistics(files.isEmpty());
     }
 
 

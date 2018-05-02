@@ -105,7 +105,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
             // prepare label for the value
             Label lblGlobalStatsValue = new Label();
             lblGlobalStatsValue.setId("lblExtractorStats" + contractType.name());
-            lblGlobalStatsValue.setText("0");
+            lblGlobalStatsValue.setText("-");
 
             gridGlobalStatsExtractor.addRow(gridRow + ITEMS_IN_EXTRACTOR_STATISTICS, lblGlobalStatsTitle);
             gridGlobalStatsExtractor.add(lblGlobalStatsValue, 1, gridRow + ITEMS_IN_EXTRACTOR_STATISTICS);
@@ -119,7 +119,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
             // prepare label for the value
             Label lblValue = new Label();
             lblValue.setId("lblContractNumber" + contractType.name());
-            lblValue.setText("0");
+            lblValue.setText("-");
 
             // add labels to statistics table
             gridDetailsExtractor.addRow(gridRow + ITEMS_IN_EXTRACTOR_DETAILS, lblTitle);
@@ -339,7 +339,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
             if (used) {
                 Label lblContractNumber = (Label) Utils.lookup("#lblContractNumber" + contractType.name(), ContractManager.getMainScene());
-                lblContractNumber.setText("0");
+                lblContractNumber.setText("-");
             }
         }
 
@@ -348,7 +348,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
     }
 
 
-    public void updateGlobalStatistics() {
+    public void updateGlobalStatistics(boolean clear) {
 
         Label lblGlobalStatsFilesValue = (Label) Utils.lookup("#lblExtractorStatsFilesValue", ContractManager.getMainScene());
         Label lblGlobalStatsClassesValue = (Label) Utils.lookup("#lblExtractorStatsClassesValue", ContractManager.getMainScene());
@@ -356,11 +356,21 @@ public class ExtractorApplicationTab extends ApplicationTab{
         Label lblGlobalStatsMethodsWithValue = (Label) Utils.lookup("#lblExtractorStatsMethodsWithValue", ContractManager.getMainScene());
         Label lblGlobalStatsContractsValue = (Label) Utils.lookup("#lblExtractorStatsContractsValue", ContractManager.getMainScene());
 
-        lblGlobalStatsFilesValue.setText("" + globalStatistics.getNumberOfFiles());
-        lblGlobalStatsClassesValue.setText("" + globalStatistics.getNumberOfClasses());
-        lblGlobalStatsMethodsValue.setText("" + globalStatistics.getNumberOfMethods());
-        lblGlobalStatsMethodsWithValue.setText("" + globalStatistics.getNumberOfMethodsWithContracts());
-        lblGlobalStatsContractsValue.setText("" + globalStatistics.getTotalNumberOfContracts());
+        if(!clear) {
+            lblGlobalStatsFilesValue.setText("" + globalStatistics.getNumberOfFiles());
+            lblGlobalStatsClassesValue.setText("" + globalStatistics.getNumberOfClasses());
+            lblGlobalStatsMethodsValue.setText("" + globalStatistics.getNumberOfMethods());
+            lblGlobalStatsMethodsWithValue.setText("" + globalStatistics.getNumberOfMethodsWithContracts());
+            lblGlobalStatsContractsValue.setText("" + globalStatistics.getTotalNumberOfContracts());
+        }
+        else{
+            String notDefined = "-";
+            lblGlobalStatsFilesValue.setText(notDefined);
+            lblGlobalStatsClassesValue.setText(notDefined);
+            lblGlobalStatsMethodsValue.setText(notDefined);
+            lblGlobalStatsMethodsWithValue.setText(notDefined);
+            lblGlobalStatsContractsValue.setText(notDefined);
+        }
 
         // display number of contracts for each selected design by contract type
         for (Map.Entry<ContractType, Boolean> entry : ContractManager.getApplicationData().getSettings()
@@ -370,7 +380,13 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
             if (used) {
                 Label lblContractValue = (Label) ContractManager.getMainScene().lookup("#lblExtractorStats" + contractType.name());
-                lblContractValue.setText("" + globalStatistics.getNumberOfContracts().get(contractType));
+
+                if(!clear) {
+                    lblContractValue.setText("" + globalStatistics.getNumberOfContracts().get(contractType));
+                }
+                else{
+                    lblContractValue.setText("-");
+                }
             }
         }
     }
