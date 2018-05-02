@@ -17,6 +17,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import javax.rmi.CORBA.Util;
 import java.util.Map;
 
 public class ExtractorApplicationTab extends ApplicationTab{
@@ -92,6 +93,9 @@ public class ExtractorApplicationTab extends ApplicationTab{
             toggleButtonExtractor.setText(contractType.name());
             toggleButtonExtractor.setFocusTraversable(false);
 
+            Tooltip tooltip = new Tooltip(ResourceHandler.getLocaleString("tooltipShowContractsOfType",contractType.name()));
+            toggleButtonExtractor.setTooltip(tooltip);
+
 
             // prepare label for number of contracts of given type in statistics table
             Label lblGlobalStatsTitle = new Label();
@@ -114,7 +118,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
             // prepare label for the value
             Label lblValue = new Label();
-            lblValue.setId("lbl_" + contractType.name());
+            lblValue.setId("lblContractNumber" + contractType.name());
             lblValue.setText("0");
 
             // add labels to statistics table
@@ -151,7 +155,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
         if(currentJavaFile != null) {
 
-            String sceneFXMLName = ResourceHandler.getProperties().getString("sceneDetailsFileName");
+            String sceneFXMLName = ResourceHandler.getProperties().getString("sceneDetailsExtractorFileName");
             String windowName = ResourceHandler.getLocaleString("windowTitleDetails") + " - "
                     + currentJavaFile.getShortPath();
 
@@ -289,13 +293,15 @@ public class ExtractorApplicationTab extends ApplicationTab{
         // get selected file and save it into presentation model
         int selectedId = fileList.getCheckListView().getSelectionModel().getSelectedIndex();
 
+        Label lblFileValue = (Label) Utils.lookup("#lblFileValueExtractor", ContractManager.getMainScene());
+
         if(selectedId >= 0 && selectedId < fileList.getFiles().size()) {
             
             currentJavaFile = fileList.getFiles().get(selectedId);
 
             // update label with name of the file
-            Label lblFileValueExtractor = (Label) Utils.lookup("#lblFileValueExtractor", ContractManager.getMainScene());
-            lblFileValueExtractor.setText(currentJavaFile.getFullPath());
+
+            lblFileValue.setText(currentJavaFile.getFullPath());
 
             // display number of contracts for each selected design by contract type
             for (Map.Entry<ContractType, Boolean> entry : ContractManager.getApplicationData().getSettings()
@@ -304,8 +310,8 @@ public class ExtractorApplicationTab extends ApplicationTab{
                 boolean used = entry.getValue();
 
                 if (used) {
-                    Label lbl_value = (Label) Utils.lookup("#lbl_" + contractType.name(), ContractManager.getMainScene());
-                    lbl_value.setText("" + currentJavaFile.getJavaFileStatistics().getNumberOfContracts().get(contractType));
+                    Label lblContractNumber = (Label) Utils.lookup("#lblContractNumber" + contractType.name(), ContractManager.getMainScene());
+                    lblContractNumber.setText("" + currentJavaFile.getJavaFileStatistics().getNumberOfContracts().get(contractType));
                 }
             }
 
@@ -313,6 +319,32 @@ public class ExtractorApplicationTab extends ApplicationTab{
             Button btnShowDetails = (Button) ContractManager.getMainScene().lookup("#btnShowDetailsExtractor");
             btnShowDetails.setDisable(false);
         }
+        else{
+            clearFileDetails();
+        }
+    }
+
+
+    public void clearFileDetails(){
+
+        currentJavaFile = null;
+
+        Label lblFileValue = (Label) Utils.lookup("#lblFileValueExtractor", ContractManager.getMainScene());
+        lblFileValue.setText(ResourceHandler.getLocaleString("labelFileDefaultValue"));
+
+        for (Map.Entry<ContractType, Boolean> entry : ContractManager.getApplicationData().getSettings()
+                .getContractTypes().entrySet()) {
+            ContractType contractType = entry.getKey();
+            boolean used = entry.getValue();
+
+            if (used) {
+                Label lblContractNumber = (Label) Utils.lookup("#lblContractNumber" + contractType.name(), ContractManager.getMainScene());
+                lblContractNumber.setText("0");
+            }
+        }
+
+        Button btnShowDetails = (Button) Utils.lookup("#btnShowDetailsExtractor", ContractManager.getMainScene());
+        btnShowDetails.setDisable(true);
     }
 
 
@@ -358,5 +390,9 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
     public JavaFile getCurrentJavaFile() {
         return currentJavaFile;
+    }
+
+    public void setCurrentJavaFile(JavaFile currentJavaFile) {
+        this.currentJavaFile = currentJavaFile;
     }
 }

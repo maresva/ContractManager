@@ -162,6 +162,10 @@ public class ExtractorFileList implements FileList {
 
             if(newIndex < files.size()) {
 
+                if(files.get(newIndex).equals(ContractManager.getApplicationData().getExtractorApplicationTab().getCurrentJavaFile())){
+                    ContractManager.getApplicationData().getExtractorApplicationTab().clearFileDetails();
+                }
+
                 ContractManager.getApplicationData().getExtractorApplicationTab().getGlobalStatistics()
                         .detachStatistics(files.get(newIndex).getJavaFileStatistics());
                 files.remove(newIndex);
@@ -239,6 +243,7 @@ public class ExtractorFileList implements FileList {
             btn_select_all.setDisable(false);
         }
         else {
+            ContractManager.getApplicationData().getExtractorApplicationTab().clearFileDetails();
             lblExtractorListEmpty.setVisible(true);
             btn_select_all.setDisable(true);
         }

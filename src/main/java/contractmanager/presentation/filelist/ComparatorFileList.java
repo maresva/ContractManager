@@ -138,7 +138,7 @@ public class ComparatorFileList implements FileList {
     }
 
 
-    public void clearScene(boolean isFirst){
+    private void clearScene(boolean isFirst){
 
         // clear the other folder
         if(isFirst){
@@ -153,8 +153,6 @@ public class ComparatorFileList implements FileList {
         // clear the report list
         reports = new ArrayList<>();
         updateList();
-
-
 
         // clear global statistics and report details
         ContractManager.getApplicationData().getComparatorApplicationTab().setFolderCompareReport(null);
@@ -227,10 +225,37 @@ public class ComparatorFileList implements FileList {
         ContractManager.getApplicationData().getComparatorApplicationTab().updateGlobalStatistics();
     }
 
-    private void updateSelected(int numberOfReportsTotal, int numberOfReportsChecked) {
 
-        // TODO
-        System.out.println("updateSelected");
+    /**
+     * This method updates (De)select All button. If there are some unselected files it has Select All label.
+     * Otherwise it has Deselect All label. It also updates label informing about the number of selected files.
+     *
+     * @param numberOfFilesTotal        Total number of files
+     * @param numberOfFilesChecked      Number of selected files
+     */
+    private void updateSelected(int numberOfFilesTotal, int numberOfFilesChecked) {
+
+        // update Select all check box (is checked only if all files are selected)
+        Button btnSelectAll = (Button) ContractManager.scene.lookup("#btnComparatorSelectAll");
+        Button btnExportFiles = (Button) ContractManager.scene.lookup("#btnExportFilesComparator");
+
+        if(numberOfFilesTotal-numberOfFilesChecked == 0){
+            btnSelectAll.setText(ResourceHandler.getLocaleString("buttonDeselectAll"));
+            btnExportFiles.setDisable(false);
+        }
+        else if(numberOfFilesChecked > 0){
+            btnSelectAll.setText(ResourceHandler.getLocaleString("buttonSelectAll"));
+            btnExportFiles.setDisable(false);
+        }
+        else{
+            btnSelectAll.setText(ResourceHandler.getLocaleString("buttonSelectAll"));
+            btnExportFiles.setDisable(true);
+        }
+
+        // update info label about number of selected files
+        Label lbSelected = (Label) ContractManager.scene.lookup("#lblComparatorSelected");
+        lbSelected.setText(ResourceHandler.getLocaleString("labelSelectedFiles") + ": "
+                + numberOfFilesChecked + " / " + numberOfFilesTotal);
     }
 
 

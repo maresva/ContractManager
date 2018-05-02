@@ -114,7 +114,23 @@ public class Controller {
      */
     @FXML
     public void extractorExportToJSON(ActionEvent event){
-        fileHandler.exportJavaFilesToJSON(mainStage, ContractManager.getApplicationData().getExtractorApplicationTab().getFileList());
+        int exported = fileHandler.exportJavaFilesToJSONExtractor(mainStage);
+        // TODO print to lineInfo
+        System.out.println("Exported files: " + exported);
+    }
+
+
+    /**
+     * This method is called when clicks on export to JSON button. It show directory chooser a exports all selected
+     * JavaCompareReports to chosen folder.
+     *
+     * @param event JavaFX event
+     */
+    @FXML
+    public void comparatorExportToJSON(ActionEvent event){
+        int exported = fileHandler.exportJavaFilesToJSONComparator(mainStage);
+        // TODO print to lineInfo
+        System.out.println("Exported files: " + exported);
     }
 
 
@@ -135,7 +151,8 @@ public class Controller {
     }
 
     public void comparatorShowDetails(ActionEvent event) {
-        System.out.println("TODO show Details");
+
+        ContractManager.getApplicationData().getComparatorApplicationTab().showDetailsWindow();
     }
 
     @FXML

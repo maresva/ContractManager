@@ -115,8 +115,14 @@
                                     <Insets left="20.0" right="20.0" />
                                  </padding>
                               </Separator>
-                              <ToggleButton id="btnToggleMinJsonExtractor" focusTraversable="false" mnemonicParsing="false" onAction="#toggleMinJson" text="minJSON" />
-                              <ToggleButton id="btnToggleShowNonContractObjectsExtractor" focusTraversable="false" mnemonicParsing="false" text="%toggleShowNonContractObjects" />
+                              <ToggleButton id="btnToggleMinJsonExtractor" focusTraversable="false" mnemonicParsing="false" onAction="#toggleMinJson" text="%toggleMinJson">
+                                 <tooltip>
+                                    <Tooltip text="%tooltipMinJson" />
+                                 </tooltip></ToggleButton>
+                              <ToggleButton id="btnToggleShowNonContractObjectsExtractor" focusTraversable="false" mnemonicParsing="false" text="%toggleShowNonContractObjects">
+                                 <tooltip>
+                                    <Tooltip text="%tooltipShowNonContractObjects" />
+                                 </tooltip></ToggleButton>
                            </items>
                         </ToolBar>
                       <AnchorPane minHeight="400.0" minWidth="0.0" prefHeight="546.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="82.0">
@@ -248,7 +254,7 @@
                            <items>
                               <Button alignment="CENTER" focusTraversable="false" minWidth="43.0" mnemonicParsing="false" onAction="#comparatorAddDirectory1" textAlignment="CENTER">
                                  <tooltip>
-                                    <Tooltip text="%tooltipAddDirectory" />
+                                    <Tooltip text="%tooltipChooseFolder1" />
                                  </tooltip>
                                  <graphic>
                                     <ImageView fitHeight="27.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
@@ -262,7 +268,7 @@
                                  <font>
                                     <Font name="System Italic" size="12.0" />
                                  </font></Label>
-                              <Label minWidth="85.0" text="compare to" textOverrun="CLIP">
+                              <Label minWidth="85.0" text="%labelCompareTo" textOverrun="CLIP">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -272,7 +278,7 @@
                               </Label>
                               <Button alignment="CENTER" focusTraversable="false" minWidth="43.0" mnemonicParsing="false" onAction="#comparatorAddDirectory2" textAlignment="CENTER">
                                  <tooltip>
-                                    <Tooltip text="%tooltipAddDirectory" />
+                                    <Tooltip text="%tooltipChooseFolder2" />
                                  </tooltip>
                                  <graphic>
                                     <ImageView fitHeight="27.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
@@ -292,7 +298,7 @@
                               </Label>
                               <Button id="btnCompare" alignment="CENTER" disable="true" focusTraversable="false" minWidth="96.0" mnemonicParsing="false" onAction="#comparatorCompare" text="%buttonCompare" textAlignment="CENTER">
                                  <tooltip>
-                                    <Tooltip text="%tooltipAddDirectory" />
+                                    <Tooltip text="%tooltipCompare" />
                                  </tooltip>
                                  <graphic>
                                     <ImageView fitHeight="27.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
@@ -307,7 +313,7 @@
                                     <Insets left="20.0" right="20.0" />
                                  </padding>
                               </Separator>
-                              <Button id="btnExportFilesComparator" alignment="CENTER" disable="true" focusTraversable="false" minWidth="43.0" mnemonicParsing="false" onAction="#extractorExportToJSON" textAlignment="CENTER">
+                              <Button id="btnExportFilesComparator" alignment="CENTER" disable="true" focusTraversable="false" minWidth="43.0" mnemonicParsing="false" onAction="#comparatorExportToJSON" textAlignment="CENTER">
                                  <tooltip>
                                     <Tooltip text="%tooltipExportToJson" />
                                  </tooltip>
@@ -334,10 +340,22 @@
                                     <Insets left="20.0" right="20.0" />
                                  </padding>
                               </Separator>
-                              <ToggleButton id="btnToggleMinJsonComparator" focusTraversable="false" mnemonicParsing="false" text="%toggleMinJson" />
-                              <ToggleButton id="btnToggleShowNonContractObjectsComparator" focusTraversable="false" mnemonicParsing="false" text="%toggleShowNonContractObjects" />
-                              <ToggleButton id="btnToggleReportOnlyContractChanges" focusTraversable="false" mnemonicParsing="false" text="%toggleReportOnlyContractChanges" />
-                              <ToggleButton id="btnToggleReportEqual" focusTraversable="false" mnemonicParsing="false" text="%toggleReportEqual" />
+                              <ToggleButton id="btnToggleMinJsonComparator" focusTraversable="false" mnemonicParsing="false" text="%toggleMinJson">
+                                 <tooltip>
+                                    <Tooltip text="%tooltipMinJson" />
+                                 </tooltip></ToggleButton>
+                              <ToggleButton id="btnToggleShowNonContractObjectsComparator" focusTraversable="false" mnemonicParsing="false" text="%toggleShowNonContractObjects">
+                                 <tooltip>
+                                    <Tooltip text="%tooltipShowNonContractObjects" />
+                                 </tooltip></ToggleButton>
+                              <ToggleButton id="btnToggleReportOnlyContractChanges" focusTraversable="false" mnemonicParsing="false" text="%toggleReportOnlyContractChanges">
+                                 <tooltip>
+                                    <Tooltip text="%tooltipReportOnlyContractChanges" />
+                                 </tooltip></ToggleButton>
+                              <ToggleButton id="btnToggleReportEqual" focusTraversable="false" mnemonicParsing="false" text="%toggleReportEqual">
+                                 <tooltip>
+                                    <Tooltip text="%tooltipReportEqual" />
+                                 </tooltip></ToggleButton>
                            </items>
                         </ToolBar>
                         <AnchorPane minHeight="400.0" minWidth="0.0" prefHeight="546.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="82.0">
@@ -384,6 +402,7 @@
                                                             <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
                                                             <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
                                                             <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="136.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
                                                          </rowConstraints>
                                                          <children>
                                                             <Label text="%labelApiEqual" GridPane.rowIndex="1">
@@ -422,6 +441,12 @@
                                                                </font>
                                                             </Label>
                                                             <Label id="lblComparatorStatsContractsRemovedValue" text="-" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                            <Label text="%labelNumberOfContractsChanged" GridPane.rowIndex="6">
+                                                               <font>
+                                                                  <Font name="System Bold" size="12.0" />
+                                                               </font>
+                                                            </Label>
+                                                            <Label id="lblComparatorStatsContractsChangedValue" text="-" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                                          </children>
                                                       </GridPane>
                                                    </children>
@@ -467,7 +492,7 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label id="lblComparatorFileDetailsValue" layoutX="110.0" layoutY="22.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="30.0" />
+                                                      <Label id="lblComparatorFileDetailsValue" layoutX="110.0" layoutY="22.0" text="%labelFileDefaultValue" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="30.0" />
                                                    </children>
                                                 </AnchorPane>
                                              </items>

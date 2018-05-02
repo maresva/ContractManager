@@ -1,8 +1,10 @@
 package contractmanager.controller;
 
+import contractmanager.presentation.filelist.ComparatorFileList;
 import contractmanager.presentation.filelist.ExtractorFileList;
 import contractmanager.utility.ResourceHandler;
 import contractmanager.view.ContractManager;
+import cz.zcu.kiv.contractparser.utils.IOServices;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -30,7 +32,7 @@ public class FileHandler {
     }
     
 
-    public int exportJavaFilesToJSON(Stage stage, ExtractorFileList fileList){
+    public int exportJavaFilesToJSONExtractor(Stage stage){
 
         // display directory chooser
         File selectedDirectory = chooseFolder(stage);
@@ -40,7 +42,28 @@ public class FileHandler {
         if(selectedDirectory != null) {
 
             exportedFiles = ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi()
-                    .exportJavaFilesToJson(fileList.getSelectedFiles(), selectedDirectory, true);
+                    .exportJavaFilesToJson(ContractManager.getApplicationData().getExtractorApplicationTab()
+                    .getFileList().getSelectedFiles(), selectedDirectory, !ContractManager.getApplicationData()
+                    .getSettings().isMinJson());
+        }
+
+        return exportedFiles;
+    }
+
+
+    public int exportJavaFilesToJSONComparator(Stage stage){
+
+        // display directory chooser
+        File selectedDirectory = chooseFolder(stage);
+
+        int exportedFiles = 0;
+
+        if(selectedDirectory != null) {
+
+            exportedFiles = ContractManager.getApplicationData().getComparatorApplicationTab().getContractComparatorApi()
+                    .exportJavaFolderCompareReportToJson(ContractManager.getApplicationData().getComparatorApplicationTab()
+                    .getFolderCompareReport(), selectedDirectory, !ContractManager.getApplicationData()
+                    .getSettings().isMinJson());
         }
 
         return exportedFiles;
