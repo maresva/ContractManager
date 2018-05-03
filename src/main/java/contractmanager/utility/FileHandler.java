@@ -1,19 +1,31 @@
-package contractmanager.controller;
+package contractmanager.utility;
 
-import contractmanager.presentation.filelist.ComparatorFileList;
-import contractmanager.presentation.filelist.ExtractorFileList;
-import contractmanager.utility.ResourceHandler;
-import contractmanager.view.ContractManager;
-import cz.zcu.kiv.contractparser.utils.IOServices;
+import contractmanager.ContractManager;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.List;
 
+/**
+ * This class provides method to work with files and folders. It shows file/folder choosers and helps with data export.
+ *
+ * @author Vaclav Mares
+ */
 public class FileHandler {
 
+    /** Log4j logger for this class */
+    private final static Logger logger = Logger.getLogger(String.valueOf(FileHandler.class));
+
+    
+    /**
+     * Opens a folder chooser and returns chosen folder.
+     *
+     * @param stage     Application stage
+     * @return          Chosen folder
+     */
     public File chooseFolder(Stage stage) {
 
         DirectoryChooser chooser = new DirectoryChooser();
@@ -21,6 +33,12 @@ public class FileHandler {
     }
 
 
+    /**
+     * Opens a file chooser for multiple files and returns those chosen files.
+     *
+     * @param stage     Application stage
+     * @return          Chosen files
+     */
     public List<File> chooseFiles(Stage stage) {
 
         FileChooser fileChooser = new FileChooser();
@@ -30,9 +48,14 @@ public class FileHandler {
 
         return fileChooser.showOpenMultipleDialog(stage);
     }
-    
 
-    public int exportJavaFilesToJSONExtractor(Stage stage){
+
+    /**
+     * Exports data from extractor to JSON.
+     *
+     * @param stage     Application stage
+     */
+    public void exportJavaFilesToJSONExtractor(Stage stage){
 
         // display directory chooser
         File selectedDirectory = chooseFolder(stage);
@@ -47,11 +70,16 @@ public class FileHandler {
                     .getSettings().isMinJson());
         }
 
-        return exportedFiles;
+        logger.info(ResourceHandler.getLocaleString("infoFilesExported", exportedFiles));
     }
 
 
-    public int exportJavaFilesToJSONComparator(Stage stage){
+    /**
+     * Exports data from comparator to JSON.
+     *
+     * @param stage     Application stage
+     */
+    public void exportJavaFilesToJSONComparator(Stage stage){
 
         // display directory chooser
         File selectedDirectory = chooseFolder(stage);
@@ -66,6 +94,6 @@ public class FileHandler {
                     .getSettings().isMinJson());
         }
 
-        return exportedFiles;
+        logger.info(ResourceHandler.getLocaleString("infoReportsExported", exportedFiles));
     }
 }

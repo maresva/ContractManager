@@ -1,9 +1,9 @@
-package contractmanager.presentation.filelist;
+package contractmanager.application.filelist;
 
-import contractmanager.presentation.applicationtab.LoadingWindow;
+import contractmanager.application.applicationtab.LoadingWindow;
 import contractmanager.utility.ResourceHandler;
 import contractmanager.utility.Utils;
-import contractmanager.view.ContractManager;
+import contractmanager.ContractManager;
 import cz.zcu.kiv.contractparser.comparator.comparatormodel.JavaFileCompareReport;
 import cz.zcu.kiv.contractparser.comparator.comparatormodel.JavaFolderCompareReport;
 import cz.zcu.kiv.contractparser.utils.IOServices;
@@ -15,35 +15,56 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import org.apache.log4j.Logger;
 import org.controlsfx.control.CheckListView;
 
-import javax.rmi.CORBA.Util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents file list for Comparator Application Tab. It contains JavaFileCompareReports. It takes care
+ * of adding and removing files from the list and all things connected to its display.
+ *
+ * @author Vaclav Mares
+ */
 public class ComparatorFileList implements FileList {
 
-    private static final String CLV_SELECTOR = "#clvFilesComparator";
+    /** Log4j logger for this class */
+    private final static Logger logger = Logger.getLogger(String.valueOf(ComparatorFileList.class));
 
+    /** CheckListView as a graphics representation of this FileList */
     private CheckListView checkListView;
 
+    /** Selector for this file list to avoid multiple raw Strings */
+    private static final String CLV_SELECTOR = "#clvFilesComparator";
+
+    /** List of reports that are displayed in the CheckListView */
     private List<JavaFileCompareReport> reports;
 
+    /** First folder of the comparison */
     private File firstFolder;
 
+    /** Second folder of the comparison */
     private File secondFolder;
 
+    /** Flags whether or not folders has been already compared */
     private boolean compared;
 
 
     public ComparatorFileList() {
         compared = false;
-        //checkListView = (CheckListView) Utils.lookup(CLV_SELECTOR, ContractManager.getMainScene());
+        reports = new ArrayList<>();
     }
 
 
-
+    /**
+     * Selects one of the two folders needed form comparison. It updates labels and also other controls depending
+     * whether comparison already happened or if the other folder is also selected.
+     *
+     * @param selectedDirectory     Selected directory to be displayed
+     * @param isFirst               Whether this is the first folder (true) os second (false)
+     */
     public void selectDirectory(File selectedDirectory, boolean isFirst) {
 
         // set first or second directory
@@ -68,6 +89,13 @@ public class ComparatorFileList implements FileList {
         }
     }
 
+
+    /**
+     * Sets label for selected folder.
+     *
+     * @param selectedDirectory     Selected folder
+     * @param selector              UI selector for the label
+     */
     private void setFolderLabel(File selectedDirectory, String selector){
 
         String path;
@@ -88,6 +116,10 @@ public class ComparatorFileList implements FileList {
     }
 
 
+    /**
+     * Compare Java files from both selected folders. This option is enabled only if both folders are specified.
+     * This action is connected with loading window which is shown during the job.
+     */
     public void compareFolders() {
 
         LoadingWindow loadingWindow = ContractManager.getApplicationData().getComparatorApplicationTab().getLoadingWindow();
@@ -111,8 +143,7 @@ public class ComparatorFileList implements FileList {
                 btnCompare.setDisable(true);
                 compared = true;
 
-                // TODO print addedReports.size()
-                System.out.println("addedReports: " + reports.size());
+                logger.info(ResourceHandler.getLocaleString("infoReportsAdded", reports.size()));
 
                 return true;
             }
@@ -138,6 +169,11 @@ public class ComparatorFileList implements FileList {
     }
 
 
+    /**
+     * This method clears the scene after new folder has been selected. It clears stats, details and the other folder.
+     *
+     * @param isFirst   If first folder has been selected to init this clear
+     */
     private void clearScene(boolean isFirst){
 
         // clear the other folder
@@ -162,10 +198,11 @@ public class ComparatorFileList implements FileList {
     }
 
 
-    @Override
+    /**
+     * Updates list of reports. Based on the state of list it adjust other controls for instance hides/show
+     * list is empty label disables/enables buttons etc.
+     */
     public void updateList() {
-
-        //ContractManager.getApplicationData().getComparatorApplicationTab().getGlobalStatistics();
 
         checkListView = (CheckListView) ContractManager.scene.lookup(CLV_SELECTOR);
 
@@ -258,17 +295,7 @@ public class ComparatorFileList implements FileList {
                 + numberOfFilesChecked + " / " + numberOfFilesTotal);
     }
 
-
-
-
-
-    private void updateShortPath() {
-
-        // TODO pridat metodu do ContractComparatorAPI
-        //ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi().updateShortPathOfJavaFiles(reports);
-    }
-
-
+    
     /**
      * This action is called when (De)Select All button is pressed. It does as it says its label. If it says Select All
      * it select all items. Otherwise it deselects all.
@@ -286,24 +313,11 @@ public class ComparatorFileList implements FileList {
     }
 
 
-    @Override
-    public List<Integer> getSelected() {
-        System.out.println("TODO getSelected returns NULL");
-        return null;
-    }
-
-    @Override
-    public List<?> getSelectedFiles() {
-        System.out.println("TODO getSelectedFiles returns NULL");
-        return null;
-    }
-
-    @Override
+    // Getters and Setters
     public CheckListView getCheckListView() {
         return checkListView;
     }
 
-    @Override
     public List<?> getFiles() {
         return reports;
     }

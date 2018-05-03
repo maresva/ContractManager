@@ -22,7 +22,7 @@ public class ResourceHandler {
     private static final ResourceBundle properties = ResourceBundle.getBundle("contractmanager");
 
     /** ResourceBundle with localization Strings */
-    public static final ResourceBundle localization = ResourceBundle.getBundle("contractmanager",
+    private static final ResourceBundle localization = ResourceBundle.getBundle("contractmanager",
             new Locale("en", "EN"));
 
 

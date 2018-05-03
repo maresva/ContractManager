@@ -1,8 +1,8 @@
-package contractmanager.presentation.applicationtab;
+package contractmanager.application.applicationtab;
 
-import contractmanager.presentation.filelist.FileList;
+import contractmanager.application.filelist.FileList;
 import contractmanager.utility.ResourceHandler;
-import contractmanager.view.ContractManager;
+import contractmanager.ContractManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,20 +12,30 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
+/**
+ * Represents loading window which is shown to disable application and show user that it is loading. It can also
+ * contain progress bar.
+ */
 public class LoadingWindow {
 
+    /** Stage of the loading window */
     private Stage loadingStage;
+
+    /** Scene of the loading window */
     private Scene loadingScene;
 
+    /** FXML file with scene of the window */
     private String sceneFile;
 
+    
     public LoadingWindow(String sceneFile){
         this.sceneFile = sceneFile;
     }
 
+    
     /**
-     * When loading of files is started - loading window is displayed for user. It shows progress of the action
-     * on progress bar which is periodically updated.
+     * Shows loading window which blocks any controls. It should be run from any thread (task) and hidden after the
+     * job is done.
      */
     public void show() {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(sceneFile));
@@ -56,6 +66,8 @@ public class LoadingWindow {
     }
 
 
+
+    // Getters and Setters
     public Stage getLoadingStage() {
 
         if(loadingStage == null){

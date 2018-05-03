@@ -1,19 +1,31 @@
-package contractmanager.presentation;
+package contractmanager.application;
 
 import contractmanager.utility.ResourceHandler;
 import cz.zcu.kiv.contractparser.model.ContractType;
 
 import java.util.HashMap;
 
+/**
+ * This class contains information about settings of the application. It contains boolean for each filter option.
+ */
 public class Settings {
 
+    /** Every generated JSON will be in minimalistic format instead of human readable pretty print */
     private boolean minJson;
+
+    /** Show every file, class or method even those without any contract */
     private boolean showNonContractObjects;
+
+    /** Only changes affecting contracts will be reported */
     private boolean reportOnlyContractChanges;
+
+    /** Even though both files, classes, methods or contracts are equal report will be created */
     private boolean reportEqual;
 
+    /** Which contracts should be visible through out the application */
     private HashMap<ContractType,Boolean> contractTypes;
 
+    
     public Settings() {
         minJson = Boolean.parseBoolean(ResourceHandler.getProperties().getString("defaultMinJson"));
         showNonContractObjects = Boolean.parseBoolean(ResourceHandler.getProperties().getString("defaultShowNonContractObjects"));
@@ -28,6 +40,19 @@ public class Settings {
     }
 
 
+    @Override
+    public String toString() {
+        return "Settings{" +
+                "minJson=" + minJson +
+                ", showNonContractObjects=" + showNonContractObjects +
+                ", reportOnlyContractChanges=" + reportOnlyContractChanges +
+                ", reportEqual=" + reportEqual +
+                ", contractTypes=" + contractTypes +
+                '}';
+    }
+
+
+    // Getters and Setters
     public boolean isMinJson() {
         return minJson;
     }
@@ -62,5 +87,10 @@ public class Settings {
 
     public void setReportOnlyContractChanges(boolean reportOnlyContractChanges) {
         this.reportOnlyContractChanges = reportOnlyContractChanges;
+    }
+
+    public void setContractType(ContractType contractType, boolean isEnabled) {
+
+        contractTypes.replace(contractType, isEnabled);
     }
 }

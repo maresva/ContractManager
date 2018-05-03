@@ -1,18 +1,23 @@
 package contractmanager.utility;
 
-import contractmanager.view.ContractManager;
+import contractmanager.ContractManager;
 import cz.zcu.kiv.contractparser.api.BatchContractComparatorApi;
 import cz.zcu.kiv.contractparser.api.BatchContractExtractorApi;
+import cz.zcu.kiv.contractparser.comparator.comparatormodel.JavaFolderCompareReport;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 
 /**
- * This class provides methods used to work with console application part of this program. It receives commands from
+ * This class provides methods used to work with console part of this program. It receives commands from
  * user, evaluates them and either executes them or report an error.
  *
  * @author Vaclav Mares
  * */
 public class ConsoleApplication {
+
+    /** Log4j logger for this class */
+    private final static Logger logger = Logger.getLogger(String.valueOf(ConsoleApplication.class));
 
     /** API providing batch contract extractor methods */
     private BatchContractExtractorApi batchContractExtractorApi;
@@ -124,8 +129,10 @@ public class ConsoleApplication {
             }
 
 
-            batchContractComparatorApi.compareJavaFoldersAndExportToJson(firstInputFolder, secondInputFolder, !removeEqual,
-                    !reportOnlyContractChange, outputFolder, !minJson);
+            JavaFolderCompareReport report =batchContractComparatorApi.compareJavaFoldersAndExportToJson(firstInputFolder,
+                    secondInputFolder, !removeEqual, !reportOnlyContractChange, outputFolder, !minJson);
+
+            logger.info(ResourceHandler.getLocaleString("infoReportsExported", report.getJavaFileCompareReports().size()));
         }
         else{
             endWithError(ResourceHandler.getLocaleString("consoleAppErrorComparatorWrongNumParamsMin"), true);
@@ -183,8 +190,10 @@ public class ConsoleApplication {
                 }
             }
 
-            batchContractExtractorApi.retrieveContractsFromFolderExportToJson(inputFolder, outputFolder, !minJson,
-                    removeNonContractObjects);
+            int exported = batchContractExtractorApi.retrieveContractsFromFolderExportToJson(inputFolder, outputFolder,
+                    !minJson, removeNonContractObjects);
+
+            logger.info(ResourceHandler.getLocaleString("infoFilesExported", exported));
 
         }
         else{

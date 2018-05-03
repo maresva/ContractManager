@@ -1,36 +1,37 @@
-package contractmanager.presentation.applicationtab;
+package contractmanager.application.applicationtab;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import contractmanager.presentation.Settings;
-import contractmanager.presentation.filelist.ComparatorFileList;
+import contractmanager.application.Settings;
+import contractmanager.application.filelist.ComparatorFileList;
 import contractmanager.utility.ResourceHandler;
 import contractmanager.utility.Utils;
-import contractmanager.view.ContractManager;
+import contractmanager.ContractManager;
 import cz.zcu.kiv.contractparser.api.ApiFactory;
 import cz.zcu.kiv.contractparser.api.ContractComparatorApi;
 import cz.zcu.kiv.contractparser.comparator.comparatormodel.*;
 import cz.zcu.kiv.contractparser.model.ContractType;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import java.util.Map;
 
 
 public class ComparatorApplicationTab extends ApplicationTab {
 
+    /** Provides methods form ContractParser that are used for contract comparison */
+    private ContractComparatorApi contractComparatorApi;
+
     /** Object containing CheckListView with list of files */
     private ComparatorFileList fileList;
 
-    private ContractComparatorApi contractComparatorApi;
-
-    private JavaFolderCompareReport folderCompareReport;
-
+    /** Current JavaFolderCompareReport that is displayed at right bottom. It also opened in details window */
     private JavaFileCompareReport currentReport;
+
+    /** Compare report of current two folders. Among others contains reports and statistics */
+    private JavaFolderCompareReport folderCompareReport;
 
 
     public ComparatorApplicationTab() {
@@ -42,48 +43,40 @@ public class ComparatorApplicationTab extends ApplicationTab {
         loadingWindow = new LoadingWindow(ResourceHandler.getProperties().getString("sceneComparatorLoadingFileName"));
     }
 
+
+    /**
+     * Prepares scene at the start of the application.
+     */
     public void initScene() {
 
         // get filter tool bar to add contract types
         ToolBar tbFilterComparator = (ToolBar) Utils.lookup("#tbFilterComparator", ContractManager.getMainScene());
 
-        ToggleButton btnToggleMinJsonComparator = (ToggleButton) Utils.lookup("#btnToggleMinJsonComparator",
-                ContractManager.getMainScene());
-        //ToggleButton btnToggleShowNonContractObjectsComparator = (ToggleButton) Utils.lookup("#btnToggleShowNonContractObjectsComparator", ContractManager.getMainScene());
-        ToggleButton btnToggleReportOnlyContractChanges = (ToggleButton) Utils.lookup(
-                "#btnToggleReportOnlyContractChanges", ContractManager.getMainScene());
-        ToggleButton btnToggleReportEqual = (ToggleButton) Utils.lookup(
-                "#btnToggleReportEqual", ContractManager.getMainScene());
+        CheckBox chBoxMinJson = (CheckBox) Utils.lookup("#btnToggleMinJsonComparator", ContractManager.getMainScene());
+        CheckBox chBoxReportOnlyContractChanges = (CheckBox) Utils.lookup("#btnToggleReportOnlyContractChanges", ContractManager.getMainScene());
+        CheckBox chBoxReportEqual = (CheckBox) Utils.lookup("#btnToggleReportEqual", ContractManager.getMainScene());
 
         Settings settings = ContractManager.getApplicationData().getSettings();
 
         if(settings.isMinJson()){
-            btnToggleMinJsonComparator.setSelected(true);
+            chBoxMinJson.setSelected(true);
         }
         else{
-            btnToggleMinJsonComparator.setSelected(false);
+            chBoxMinJson.setSelected(false);
         }
-
-        /*
-        if(settings.isShowNonContractObjects()){
-            btnToggleShowNonContractObjectsComparator.setSelected(true);
-        }
-        else{
-            btnToggleShowNonContractObjectsComparator.setSelected(false);
-        }*/
 
         if(settings.isReportOnlyContractChanges()){
-            btnToggleReportOnlyContractChanges.setSelected(true);
+            chBoxReportOnlyContractChanges.setSelected(true);
         }
         else{
-            btnToggleReportOnlyContractChanges.setSelected(false);
+            chBoxReportOnlyContractChanges.setSelected(false);
         }
 
         if(settings.isReportEqual()){
-            btnToggleReportEqual.setSelected(true);
+            chBoxReportEqual.setSelected(true);
         }
         else{
-            btnToggleReportEqual.setSelected(false);
+            chBoxReportEqual.setSelected(false);
         }
 
         int tbIndex = 2;
@@ -95,20 +88,24 @@ public class ComparatorApplicationTab extends ApplicationTab {
             boolean contractTypeIsShown = entry.getValue();
 
             // prepare toggle buttons for tool bar filter
-            ToggleButton toggleButtonComparator = new ToggleButton();
-            toggleButtonComparator.setText(contractType.name());
-            toggleButtonComparator.setFocusTraversable(false);
+            CheckBox checkBox = new CheckBox();
+            checkBox.setText(contractType.name());
+            checkBox.setFocusTraversable(false);
+            checkBox.setId("chBoxContractComparator" + contractType);
+            int padding = Integer.parseInt(ResourceHandler.getProperties().getString("filterPadding"));
+            checkBox.setPadding(new Insets(0, padding, 0, 0));
+
 
             Tooltip tooltip = new Tooltip(ResourceHandler.getLocaleString("tooltipShowContractsOfType",contractType.name()));
-            toggleButtonComparator.setTooltip(tooltip);
+            checkBox.setTooltip(tooltip);
 
             if(contractTypeIsShown) {
                 // toggle button if shown
-                toggleButtonComparator.setSelected(true);
+                checkBox.setSelected(true);
             }
 
             // add buttons to filter tool bars
-            tbFilterComparator.getItems().add(tbIndex, toggleButtonComparator);
+            tbFilterComparator.getItems().add(tbIndex, checkBox);
 
             tbIndex++;
         }
@@ -155,8 +152,9 @@ public class ComparatorApplicationTab extends ApplicationTab {
     }
 
 
-
-
+    /**
+     * This method updates details in the right part of window each time user selects different file.
+     */
     public void updateReportDetails() {
 
         Label lblFile = (Label) Utils.lookup("#lblComparatorFileDetailsValue", ContractManager.getMainScene());
@@ -165,7 +163,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
 
         Button btnShowDetails = (Button) ContractManager.getMainScene().lookup("#btnShowDetailsComparator");
 
-        // get selected file and save it into presentation model
+        // get selected file and save it into application model
         int selectedId = fileList.getCheckListView().getSelectionModel().getSelectedIndex();
 
         if(selectedId >= 0 && selectedId < fileList.getFiles().size()) {
@@ -257,6 +255,12 @@ public class ComparatorApplicationTab extends ApplicationTab {
     }
 
 
+    /**
+     * Prepares Tree view in the Details window. It contains information from current JavaFileCompareReport and its
+     * affected by current filters. It also merges some information for better display.
+     *
+     * @param treeView  TreeView to be prepared
+     */
     private void prepareTreeView(TreeView<String> treeView){
 
         TreeItem<String> tiJavaFileCompareReport = new TreeItem<>(ResourceHandler.getLocaleString("javaFileCompareReport"));
@@ -315,6 +319,12 @@ public class ComparatorApplicationTab extends ApplicationTab {
     }
 
 
+    /**
+     * Prepares title for ContractCompareReport by merging two attributes for better human readability
+     *
+     * @param compareReport     ContractCompareReport for which the title is created
+     * @return                  String with prepared title
+     */
     private String createCompareReportTitle(ContractCompareReport compareReport) {
 
         String title = ResourceHandler.getLocaleString("treeContract") + " - ";
@@ -328,8 +338,9 @@ public class ComparatorApplicationTab extends ApplicationTab {
 
         return title;
     }
+          
 
-
+    // Getters and Setters
     public ComparatorFileList getFileList() {
         return fileList;
     }

@@ -28,7 +28,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>contractmanager.view.ContractManager</mainClass>
+                            <mainClass>contractmanager.ContractManager</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -38,7 +38,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>contractmanager.view.ContractManager</mainClass>
+                            <mainClass>contractmanager.ContractManager</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

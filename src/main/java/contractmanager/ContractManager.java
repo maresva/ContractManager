@@ -1,7 +1,7 @@
-package contractmanager.view;
+package contractmanager;
 
 import contractmanager.controller.Controller;
-import contractmanager.presentation.ApplicationData;
+import contractmanager.application.ApplicationData;
 import contractmanager.utility.ConsoleApplication;
 import contractmanager.utility.ResourceHandler;
 import cz.zcu.kiv.contractparser.api.ApiFactory;
@@ -10,7 +10,6 @@ import cz.zcu.kiv.contractparser.api.BatchContractExtractorApi;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -22,17 +21,27 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 
 
+/**
+ * This class is the Launcher for this program. It either runs the application with graphics interface or process given
+ * arguments and runs the application as a single command.
+ *
+ * @author Vaclav Mares
+ */
 public class ContractManager extends Application {
 
     /** Log4j logger for this class */
     private final static Logger logger = Logger.getLogger(String.valueOf(ContractManager.class));
 
+    /** Default font for labels */
     public static final Font DEFAULT_LABEL_TITLE_FONT = Font.font("System", FontWeight.BOLD, 12);
 
+    /** Main stage of application */
     public static Stage stage;
+
+    /** Main scene of application */
     public static Scene scene;
 
-
+    /** Application data containing individual parts of application */
     private static ApplicationData applicationData;
 
 
@@ -74,7 +83,7 @@ public class ContractManager extends Application {
 
     /**
      * Prepares main window of the application. It sets its title, icon, size etc. It also prepares on close and action,
-     * controller and presentation management.
+     * controller and application management.
      */
     private void prepareWindow(){
 
@@ -109,7 +118,7 @@ public class ContractManager extends Application {
                 System.exit(0);
             });
 
-            // prepare presentation model
+            // prepare application model
             applicationData = new ApplicationData();
 
             // prepare controller
@@ -143,6 +152,7 @@ public class ContractManager extends Application {
     }
 
 
+    // Getters and Setters
     public static ApplicationData getApplicationData() {
         return applicationData;
     }

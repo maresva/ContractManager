@@ -10,7 +10,7 @@
          <children>
             <Label alignment="CENTER" contentDisplay="CENTER" layoutX="281.0" layoutY="345.0" text="%loadingCompare" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <font>
-                  <Font size="32.0" />
+                  <Font size="24.0" />
                </font>
             </Label>
          </children>

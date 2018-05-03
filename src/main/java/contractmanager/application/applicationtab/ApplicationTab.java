@@ -1,23 +1,26 @@
-package contractmanager.presentation.applicationtab;
+package contractmanager.application.applicationtab;
 
 import contractmanager.utility.ResourceHandler;
-import contractmanager.view.ContractManager;
+import contractmanager.ContractManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import static contractmanager.utility.Utils.centerScene;
 
 
 /**
- * Parent class representing Application Tabs. It contains its FileList and other presentation needed to represent
- * application tab.
+ * Parent class representing Application Tabs. It contains common methods for child application tab.
  *
  * @author Vaclav Mares
  */
 public class ApplicationTab {
+
+    /** Log4j logger for this class */
+    private final static Logger logger = Logger.getLogger(String.valueOf(ApplicationTab.class));
 
     /** Loading window that is shown upon loading it can have progress bar */
     LoadingWindow loadingWindow;
@@ -28,7 +31,7 @@ public class ApplicationTab {
 
     public ApplicationTab() {
     }
-
+    
 
     /**
      * Prepares window for details view. It creates object and sets the size of window and its position.
@@ -65,10 +68,13 @@ public class ApplicationTab {
             stage.show();
         }
         catch (Exception e){
-            // TODO could not show Details
+            logger.error(ResourceHandler.getLocaleString("guiErrorShowDetailsWindow"));
+            logger.error(e.getMessage());
         }
     }
 
+
+    // Getters and Setters
     public LoadingWindow getLoadingWindow() {
         return loadingWindow;
     }

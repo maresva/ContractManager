@@ -1,7 +1,7 @@
 package contractmanager.controller;
 
-import contractmanager.presentation.applicationtab.LoadingWindow;
-import contractmanager.view.ContractManager;
+import contractmanager.ContractManager;
+import contractmanager.utility.FileHandler;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,12 +10,16 @@ import javafx.stage.*;
 import java.io.File;
 import java.util.List;
 
+
+/**
+ * Controller that binds actions to buttons.
+ */
 public class Controller {
 
     /** Main stage of application */
     private Stage mainStage;
 
-    /** Manipulates with files especially work with file or folder choosers */
+    /** Manipulates with files especially with file or folder choosers */
     private FileHandler fileHandler;
 
 
@@ -94,9 +98,9 @@ public class Controller {
 
 
     /**
-     * This method is called when user chooses to see details about selected files. It shows new window with details
-     * and fills it with values. It show basic information such filename or path as well as statistics about
-     * number of contracts etc. It also shows the export structure of selected file
+     * This method is called when user chooses to see details about selected file. It shows new window with details
+     * and fills it with values. It show basic information such as filename as well as statistics about number of
+     * contracts etc. It also shows the export structure of selected file.
      *
      * @param event JavaFX event
      */
@@ -114,9 +118,7 @@ public class Controller {
      */
     @FXML
     public void extractorExportToJSON(ActionEvent event){
-        int exported = fileHandler.exportJavaFilesToJSONExtractor(mainStage);
-        // TODO print to lineInfo
-        System.out.println("Exported files: " + exported);
+        fileHandler.exportJavaFilesToJSONExtractor(mainStage);
     }
 
 
@@ -128,33 +130,29 @@ public class Controller {
      */
     @FXML
     public void comparatorExportToJSON(ActionEvent event){
-        int exported = fileHandler.exportJavaFilesToJSONComparator(mainStage);
-        // TODO print to lineInfo
-        System.out.println("Exported files: " + exported);
+         fileHandler.exportJavaFilesToJSONComparator(mainStage);
     }
 
 
     /**
-     * This action closes the application.
+     * This method is called when user chooses to see details about selected file. It shows new window with details
+     * and fills it with values. It show basic information such as filename as well as statistics about number of
+     * contracts etc. It also shows the export structure of selected file.
      *
      * @param event JavaFX event
      */
     @FXML
-    public void closeApplication(ActionEvent event) {
-        Platform.exit();
-        System.exit(0);
-    }
-
-
-    public void toggleMinJson(ActionEvent event) {
-         
-    }
-
     public void comparatorShowDetails(ActionEvent event) {
 
         ContractManager.getApplicationData().getComparatorApplicationTab().showDetailsWindow();
     }
 
+
+    /**
+     * This action shows folder chooser and after choice it sets the first folder for Comparator.
+     *
+     * @param event JavaFX event
+     */
     @FXML
     public void comparatorAddDirectory1(ActionEvent event) {
 
@@ -166,6 +164,12 @@ public class Controller {
         }
     }
 
+
+    /**
+     * This action shows folder chooser and after choice it sets the second folder for Comparator.
+     *
+     * @param event JavaFX event
+     */
     @FXML
     public void comparatorAddDirectory2(ActionEvent event) {
 
@@ -177,14 +181,51 @@ public class Controller {
         }
     }
 
+
+    /**
+     * This action does comparison of both folders. Then it updates statistics and file list
+     *
+     * @param event JavaFX event
+     */
     @FXML
     public void comparatorCompare(ActionEvent event) {
 
         ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().compareFolders();
     }
 
+
+    /**
+     * This action is called when (De)Select All button is pressed. It does as it says its label. If it says Select All
+     * it select all items. Otherwise it deselects all.
+     *
+     * @param event JavaFX event
+     */
     public void comparatorSelectAll(ActionEvent event) {
 
         ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().selectAll();
+    }
+
+
+    /**
+     * This action applies filter which consists of multiple check boxes.
+     *
+     * @param event JavaFX event
+     */
+    @FXML
+    public void filterExtractor(ActionEvent event) {
+
+        ContractManager.getApplicationData().filterData(true);
+    }
+
+
+    /**
+     * This action applies filter which consists of multiple check boxes.
+     *
+     * @param event JavaFX event
+     */
+    @FXML
+    public void filterComparator(ActionEvent event) {
+
+        ContractManager.getApplicationData().filterData(false);
     }
 }

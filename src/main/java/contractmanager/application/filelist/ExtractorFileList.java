@@ -1,9 +1,8 @@
-package contractmanager.presentation.filelist;
+package contractmanager.application.filelist;
 
-import contractmanager.presentation.applicationtab.LoadingWindow;
+import contractmanager.application.applicationtab.LoadingWindow;
 import contractmanager.utility.ResourceHandler;
-import contractmanager.utility.Utils;
-import contractmanager.view.ContractManager;
+import contractmanager.ContractManager;
 import cz.zcu.kiv.contractparser.model.JavaFile;
 import cz.zcu.kiv.contractparser.utils.IOServices;
 import javafx.collections.FXCollections;
@@ -14,26 +13,38 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
+import org.apache.log4j.Logger;
 import org.controlsfx.control.CheckListView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents file list for Extractor Application Tab. It contains JavaFiles. It takes care
+ * of adding and removing files from the list and all things connected to its display.
+ *
+ * @author Vaclav Mares
+ */
 public class ExtractorFileList implements FileList {
 
-    private static final String CLV_SELECTOR = "#clvFilesExtractor";
+    /** Log4j logger for this class */
+    private final static Logger logger = Logger.getLogger(String.valueOf(ExtractorFileList.class));
 
+    /** CheckListView as a graphics representation of this FileList */
     private CheckListView checkListView;
 
+    /** Selector for this file list to avoid multiple raw Strings */
+    private static final String CLV_SELECTOR = "#clvFilesExtractor";
+
+    /** List of files that are displayed in the CheckListView */
     private List<JavaFile> files;
+
 
     public ExtractorFileList() {
         super();
-        //this.checkListView = (CheckListView) Utils.lookup(CLV_SELECTOR, ContractManager.getMainScene());
         this.files = new ArrayList<>();
     }
-
 
 
     /**
@@ -77,11 +88,13 @@ public class ExtractorFileList implements FileList {
                             pb_loading.setProgress(pb_loading.getProgress() + progressIncrease);
                         }
                     } else {
+                        logger.info(ResourceHandler.getLocaleString("infoFilesAdded", addedFiles));
                         // stop if action was cancelled
                         break;
                     }
                 }
 
+                logger.info(ResourceHandler.getLocaleString("infoFilesAdded", addedFiles));
                 return true;
             }
         };
@@ -106,19 +119,19 @@ public class ExtractorFileList implements FileList {
     }
 
 
+    /**
+     * Adds single file the list. It checks whether this file is not already in the list if so false is returned.
+     *
+     * @param newFile   File to be added
+     * @return          If file was added or not
+     */
     private boolean addFile(File newFile) {
 
         // check whether this file is not already present
         boolean found = false;
         for(JavaFile javaFile : files) {
 
-            if(javaFile == null){
-                System.out.println("javaFile je NULL");
-                return false;
-            }
-
-            if(newFile == null) {
-                System.out.println("newFile je NULL");
+            if(javaFile == null || newFile == null){
                 return false;
             }
 
@@ -127,7 +140,6 @@ public class ExtractorFileList implements FileList {
                 break;
             }
         }
-
 
         // if the file is not in the list yet - add it
         if (!found) {
@@ -149,7 +161,10 @@ public class ExtractorFileList implements FileList {
     }
 
 
-    public int removeFiles() {
+    /**
+     * Removes all selected files from the list.
+     */
+    public void removeFiles() {
 
         List<Integer> checkedIndexes = getSelected();
 
@@ -175,11 +190,16 @@ public class ExtractorFileList implements FileList {
 
         updateList();
 
-        return deletedFiles;
+        logger.info(ResourceHandler.getLocaleString("infoFilesRemoved", deletedFiles));
     }
 
 
-    public List<Integer> getSelected() {
+    /**
+     * Get indexes of the selected files.
+     *
+     * @return  List of indexes
+     */
+    private List<Integer> getSelected() {
 
         // create list with indexes of checked files
         List<Integer> checkedIndexes = new ArrayList<>();
@@ -194,6 +214,11 @@ public class ExtractorFileList implements FileList {
     }
 
 
+    /**
+     * Get selected JavaFiles.
+     *
+     * @return  List of selected files
+     */
     public List<JavaFile> getSelectedFiles() {
 
         List<JavaFile> javaFiles = new ArrayList<>();
@@ -276,8 +301,6 @@ public class ExtractorFileList implements FileList {
     }
 
 
-
-
     /**
      * This method updates (De)select All button. If there are some unselected files it has Select All label.
      * Otherwise it has Deselect All label. It also updates label informing about the number of selected files.
@@ -316,6 +339,9 @@ public class ExtractorFileList implements FileList {
     }
 
 
+    /**
+     * This method updates short path of files in the list.
+     */
     private void updateShortPath() {
 
         ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi()
@@ -339,6 +365,9 @@ public class ExtractorFileList implements FileList {
         }
     }
 
+
+
+    // Getters and Setters
     public List<JavaFile> getFiles() {
         return files;
     }
