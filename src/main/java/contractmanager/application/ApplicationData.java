@@ -42,7 +42,11 @@ public class ApplicationData {
 
         updateSettings(isExtractor);
 
-        System.out.println(settings);
+        extractorApplicationTab.getFileList().updateList();
+        extractorApplicationTab.updateFileDetails();
+        
+        comparatorApplicationTab.getFileList().updateList();
+        comparatorApplicationTab.updateReportDetails();
     }
 
 

@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import contractmanager.application.Settings;
 import contractmanager.application.filelist.ExtractorFileList;
+import contractmanager.application.filelist.JavaFileItem;
 import contractmanager.utility.ResourceHandler;
 import contractmanager.utility.Utils;
 import contractmanager.ContractManager;
@@ -18,8 +19,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class representing Extractor application tab. It contains the file list, currently selected file, api which
+ * provides ContractParser methods etc.
+ *
+ * @author Vaclav Mares
+ */
 public class ExtractorApplicationTab extends ApplicationTab{
 
     /** Provides methods form ContractParser that are used for contract extracting */
@@ -28,8 +36,8 @@ public class ExtractorApplicationTab extends ApplicationTab{
     /** Object containing CheckListView with list of files */
     private ExtractorFileList fileList;
 
-    /** Current JavaFile that is displayed at right bottom. It also opened in details window */
-    private JavaFile currentJavaFile;
+    /** Current JavaFileItem that is displayed at right bottom. It also opened in details window */
+    private JavaFileItem currentJavaFile;
 
     /** Global statistics created from the current file list */
     private JavaFileStatistics globalStatistics;
@@ -108,6 +116,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
             // prepare label for number of contracts of given type in statistics table
             Label lblGlobalStatsTitle = new Label();
             lblGlobalStatsTitle.setText(contractType.name() + " " + ResourceHandler.getLocaleString("labelContracts") + ": ");
+            lblGlobalStatsTitle.setId("lblTitleExtractorStats" + contractType.name());
             lblGlobalStatsTitle.setFont(ContractManager.DEFAULT_LABEL_TITLE_FONT);
 
             // prepare label for the value
@@ -122,6 +131,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
             // prepare label for number of contracts of given type in details table
             Label lblTitle = new Label();
             lblTitle.setText(contractType.name() + " " + ResourceHandler.getLocaleString("labelContracts") + ": ");
+            lblTitle.setId("lblTitleContractNumber" + contractType.name());
             lblTitle.setFont(ContractManager.DEFAULT_LABEL_TITLE_FONT);
 
             // prepare label for the value
@@ -161,6 +171,15 @@ public class ExtractorApplicationTab extends ApplicationTab{
      */
     public void updateGlobalStatistics(boolean clear) {
 
+        globalStatistics = new JavaFileStatistics();
+
+        for(JavaFileItem javaFileItem : fileList.getFiles()){
+
+            if(javaFileItem.isVisible()){
+                globalStatistics.mergeStatistics(javaFileItem.getJavaFile().getJavaFileStatistics());
+            }
+        }
+
         Label lblGlobalStatsFilesValue = (Label) Utils.lookup("#lblExtractorStatsFilesValue", ContractManager.getMainScene());
         Label lblGlobalStatsClassesValue = (Label) Utils.lookup("#lblExtractorStatsClassesValue", ContractManager.getMainScene());
         Label lblGlobalStatsMethodsValue = (Label) Utils.lookup("#lblExtractorStatsMethodsValue", ContractManager.getMainScene());
@@ -189,8 +208,12 @@ public class ExtractorApplicationTab extends ApplicationTab{
             ContractType contractType = entry.getKey();
             boolean used = entry.getValue();
 
+            Label lblContractValue = (Label) ContractManager.getMainScene().lookup("#lblExtractorStats" + contractType.name());
+            Label lblTitleContractValue = (Label) ContractManager.getMainScene().lookup("#lblTitleExtractorStats" + contractType.name());
+
             if (used) {
-                Label lblContractValue = (Label) ContractManager.getMainScene().lookup("#lblExtractorStats" + contractType.name());
+                lblContractValue.setVisible(true);
+                lblTitleContractValue.setVisible(true);
 
                 if(!clear) {
                     lblContractValue.setText("" + globalStatistics.getNumberOfContracts().get(contractType));
@@ -198,6 +221,10 @@ public class ExtractorApplicationTab extends ApplicationTab{
                 else{
                     lblContractValue.setText("-");
                 }
+            }
+            else{
+                lblContractValue.setVisible(false);
+                lblTitleContractValue.setVisible(false);
             }
         }
     }
@@ -213,32 +240,45 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
         Label lblFileValue = (Label) Utils.lookup("#lblFileValueExtractor", ContractManager.getMainScene());
 
+        boolean fileAllowed = false;
         if(selectedId >= 0 && selectedId < fileList.getFiles().size()) {
 
-            currentJavaFile = fileList.getFiles().get(selectedId);
+            currentJavaFile = fileList.getVisibleFileById(selectedId);
 
             // update label with name of the file
-
-            lblFileValue.setText(currentJavaFile.getFullPath());
-
-            // display number of contracts for each selected design by contract type
-            for (Map.Entry<ContractType, Boolean> entry : ContractManager.getApplicationData().getSettings()
-                    .getContractTypes().entrySet()) {
-                ContractType contractType = entry.getKey();
-                boolean used = entry.getValue();
-
-                if (used) {
-                    Label lblContractNumber = (Label) Utils.lookup("#lblContractNumber" + contractType.name(), ContractManager.getMainScene());
-                    lblContractNumber.setText("" + currentJavaFile.getJavaFileStatistics().getNumberOfContracts().get(contractType));
-                }
-            }
+            lblFileValue.setText(currentJavaFile.getJavaFile().getFullPath());
 
             // once some file is selected - Show details button becomes available
             Button btnShowDetails = (Button) ContractManager.getMainScene().lookup("#btnShowDetailsExtractor");
             btnShowDetails.setDisable(false);
+            fileAllowed = true;
         }
         else{
             clearFileDetails();
+        }
+
+        // display number of contracts for each selected design by contract type
+        for (Map.Entry<ContractType, Boolean> entry : ContractManager.getApplicationData().getSettings()
+                .getContractTypes().entrySet()) {
+            ContractType contractType = entry.getKey();
+            boolean allowed = entry.getValue();
+
+            Label lblContractNumber = (Label) Utils.lookup("#lblContractNumber" + contractType.name(), ContractManager.getMainScene());
+            Label lblTitleContractNumber = (Label) Utils.lookup("#lblTitleContractNumber" + contractType.name(), ContractManager.getMainScene());
+
+            if (allowed) {
+                lblContractNumber.setVisible(true);
+                lblTitleContractNumber.setVisible(true);
+
+                if(fileAllowed) {
+                    lblContractNumber.setText("" + currentJavaFile.getJavaFile().getJavaFileStatistics().getNumberOfContracts().get(contractType));
+                }
+            }
+            else{
+                lblContractNumber.setVisible(false);
+                lblTitleContractNumber.setVisible(false);
+            }
+
         }
     }
 
@@ -280,7 +320,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
             String sceneFXMLName = ResourceHandler.getProperties().getString("sceneDetailsExtractorFileName");
             String windowName = ResourceHandler.getLocaleString("windowTitleDetails") + " - "
-                    + currentJavaFile.getShortPath();
+                    + currentJavaFile.getJavaFile().getShortPath();
 
             super.prepareDetailsWindow(sceneFXMLName, windowName);
 
@@ -298,19 +338,19 @@ public class ExtractorApplicationTab extends ApplicationTab{
             taJson.setText(jsonInString);
 
             Label lblFileValue = (Label) detailsScene.lookup("#lblFileValue");
-            lblFileValue.setText(currentJavaFile.getFullPath());
+            lblFileValue.setText(currentJavaFile.getJavaFile().getFullPath());
 
             Label lblClassesValue = (Label) detailsScene.lookup("#lblClassesValue");
-            lblClassesValue.setText("" + currentJavaFile.getJavaFileStatistics().getNumberOfClasses());
+            lblClassesValue.setText("" + currentJavaFile.getJavaFile().getJavaFileStatistics().getNumberOfClasses());
 
             Label lblMethodsValue = (Label) detailsScene.lookup("#lblMethodsValue");
-            lblMethodsValue.setText("" + currentJavaFile.getJavaFileStatistics().getNumberOfMethods());
+            lblMethodsValue.setText("" + currentJavaFile.getJavaFile().getJavaFileStatistics().getNumberOfMethods());
 
             Label lblMethodsWithValue = (Label) detailsScene.lookup("#lblMethodsWithValue");
-            lblMethodsWithValue.setText("" + currentJavaFile.getJavaFileStatistics().getNumberOfMethodsWithContracts());
+            lblMethodsWithValue.setText("" + currentJavaFile.getJavaFile().getJavaFileStatistics().getNumberOfMethodsWithContracts());
 
             Label lblContractsValue = (Label) detailsScene.lookup("#lblContractsValue");
-            lblContractsValue.setText("" + currentJavaFile.getJavaFileStatistics().getTotalNumberOfContracts());
+            lblContractsValue.setText("" + currentJavaFile.getJavaFile().getJavaFileStatistics().getTotalNumberOfContracts());
 
             int row = 1;
             GridPane gridDetails = (GridPane) detailsScene.lookup("#gridDetails");
@@ -327,7 +367,7 @@ public class ExtractorApplicationTab extends ApplicationTab{
 
                     Label lblContractValue = new Label();
                     lblContractValue.setId("lblContractValue" + contractType.name());
-                    lblContractValue.setText("" + currentJavaFile.getJavaFileStatistics().getNumberOfContracts().get(contractType));
+                    lblContractValue.setText("" + currentJavaFile.getJavaFile().getJavaFileStatistics().getNumberOfContracts().get(contractType));
 
                     gridDetails.addRow(row, lblContractTitle);
                     gridDetails.add(lblContractValue, 3, row);
@@ -349,68 +389,139 @@ public class ExtractorApplicationTab extends ApplicationTab{
      */
     private void prepareTreeView(TreeView<String> treeView){
 
+        boolean showNonContractObjects = ContractManager.getApplicationData().getSettings().isShowNonContractObjects();
+        HashMap<ContractType, Boolean> allowedContractTypes = ContractManager.getApplicationData().getSettings().getContractTypes();
+
         TreeItem<String> tiJavaFile = new TreeItem<>(ResourceHandler.getLocaleString("javaFile"));
         tiJavaFile.setExpanded(true);
 
-        TreeItem<String> tiClasses = new TreeItem<>(ResourceHandler.getLocaleString("classes"));
+        TreeItem<String> tiClasses;
+            
+        tiClasses = new TreeItem<>(ResourceHandler.getLocaleString("classes"));
         tiClasses.setExpanded(true);
 
-        for(JavaClass javaClass : currentJavaFile.getJavaClasses()) {
+        // go through classes only if they have at least 1 contract or there is showNonContractObjects flag
+        if(!currentJavaFile.getJavaFile().getJavaClasses().isEmpty() && (!currentJavaFile.getJavaFile().getContracts().isEmpty() || showNonContractObjects)) {
 
-            TreeItem<String> tiClass = new TreeItem<>(javaClass.getSignature());
-            tiClass.setExpanded(true);
+            for (JavaClass javaClass : currentJavaFile.getJavaFile().getJavaClasses()) {
 
-            TreeItem<String> tiMethods = new TreeItem<>(ResourceHandler.getLocaleString("methods"));
-            tiMethods.setExpanded(true);
+                // class included only if it has contracts or "showNonContractObjects"
+                if (javaClass.getTotalNumberOfContracts() > 0 || showNonContractObjects) {
 
-            for(JavaMethod javaMethod : javaClass.getJavaMethods()) {
+                    TreeItem<String> tiClass = new TreeItem<>(javaClass.getSignature());
+                    tiClass.setExpanded(true);
 
-                TreeItem<String> tiMethod = new TreeItem<>(javaMethod.getSignature());
-                tiMethod.setExpanded(true);
+                    // prepare class invariants
+                    TreeItem<String> tiInvariants = new TreeItem<>(ResourceHandler.getLocaleString("invariants"));
+                    tiInvariants.setExpanded(true);
 
-                TreeItem<String> tiContracts = new TreeItem<>(ResourceHandler.getLocaleString("contracts"));
-                tiContracts.setExpanded(true);
-
-                for(Contract contract : javaMethod.getContracts()){
-
-                    TreeItem<String> tiContract = new TreeItem<>(contract.getCompleteExpression());
-                    tiContract.setExpanded(true);
-
-                    tiContract.getChildren().add(new TreeItem<>(ResourceHandler.getLocaleString(
-                            "contractType") + " " + contract.getContractType().toString()));
-                    tiContract.getChildren().add(new TreeItem<>(ResourceHandler.getLocaleString(
-                            "conditionType") + " " + contract.getConditionType().toString()));
-                    tiContract.getChildren().add(new TreeItem<>(ResourceHandler.getLocaleString(
-                            "contractFunction") + " " + contract.getFunction()));
-                    tiContract.getChildren().add(new TreeItem<>(ResourceHandler.getLocaleString(
-                            "contractExpression") + " " + contract.getExpression()));
-
-                    // if there are any arguments add this part of a tree
-                    if(contract.getArguments().size() > 0) {
-                        TreeItem<String> tiArguments = new TreeItem<>(ResourceHandler
-                                .getLocaleString("contractArguments"));
-                        tiArguments.setExpanded(true);
-
-                        for (String argument : contract.getArguments()) {
-                            tiArguments.getChildren().add(new TreeItem<>(argument));
+                    // add allowed invariants
+                    if(!javaClass.getInvariants().isEmpty()){
+                        for(Contract invariant : javaClass.getInvariants()){
+                            if(allowedContractTypes.get(invariant.getContractType())) {
+                                TreeItem<String> tiInvariant = createContractTreeItem(invariant);
+                                tiInvariants.getChildren().add(tiInvariant);
+                            }
                         }
-                        tiContract.getChildren().add(tiArguments);
                     }
 
-                    tiContracts.getChildren().add(tiContract);
+                    // if there weren't added any invariants - add empty word
+                    if(tiInvariants.getChildren().isEmpty()){
+                        tiInvariants.setValue(tiInvariants.getValue() + " - " + ResourceHandler.getLocaleString("treeEmpty"));
+                    }
+
+                    tiClass.getChildren().add(tiInvariants);
+
+                    TreeItem<String> tiMethods = new TreeItem<>(ResourceHandler.getLocaleString("methods"));
+                    tiMethods.setExpanded(true);
+
+                    // add methods if there are any
+                    if (!javaClass.getJavaMethods().isEmpty()) {
+
+                        for (JavaMethod javaMethod : javaClass.getJavaMethods()) {
+
+                            // show method only if it has any contracts or "showNonContractObjects"
+                            if(!javaMethod.getContracts().isEmpty() || showNonContractObjects){
+
+                                TreeItem<String> tiMethod = new TreeItem<>(javaMethod.getSignature());
+                                tiMethod.setExpanded(true);
+
+                                TreeItem<String> tiContracts = new TreeItem<>(ResourceHandler.getLocaleString("contracts"));
+                                tiContracts.setExpanded(true);
+
+                                if(!javaMethod.getContracts().isEmpty()) {
+
+                                    for (Contract contract : javaMethod.getContracts()) {
+
+                                        // add contract only if it should be displayed
+                                        if(allowedContractTypes.get(contract.getContractType())) {
+
+                                            TreeItem<String> tiContract = createContractTreeItem(contract);
+                                            tiContracts.getChildren().add(tiContract);
+                                        }
+                                    }
+                                }
+
+                                if(tiContracts.getChildren().isEmpty()){
+                                    tiContracts.setValue(tiContracts.getValue() + " - " + ResourceHandler.getLocaleString("treeEmpty"));
+                                }
+                                
+                                tiMethod.getChildren().add(tiContracts);
+                                tiMethods.getChildren().add(tiMethod);
+                            }
+                        }
+                    }
+
+                    if(tiMethods.getChildren().isEmpty()){
+                        tiMethods.setValue(tiMethods.getValue() + " - " + ResourceHandler.getLocaleString("treeEmpty"));
+                    }
+
+                    tiClass.getChildren().add(tiMethods);
+                    tiClasses.getChildren().add(tiClass);
                 }
-
-                tiMethod.getChildren().add(tiContracts);
-                tiMethods.getChildren().add(tiMethod);
             }
+        }
 
-            tiClass.getChildren().add(tiMethods);
-            tiClasses.getChildren().add(tiClass);
+        if(tiClasses.getChildren().isEmpty()){
+            tiClasses.setValue(tiClasses.getValue() + " - " + ResourceHandler.getLocaleString("treeEmpty"));
         }
 
         tiJavaFile.getChildren().add(tiClasses);
-
         treeView.setRoot(tiJavaFile);
+    }
+
+
+    /**
+     * This method prepares item for tree view based on given contract
+     *
+     * @param contract  Contract to be prepared for tree view
+     * @return          Tree view item with contract data
+     */
+    private TreeItem<String> createContractTreeItem(Contract contract){
+
+        TreeItem<String> tiContract = new TreeItem<>(contract.getContractType().toString() + " - " + contract.getConditionType());
+        tiContract.setExpanded(true);
+
+        tiContract.getChildren().add(new TreeItem<>(ResourceHandler.getLocaleString(
+                "completeExpression") + " " + contract.getCompleteExpression()));
+        tiContract.getChildren().add(new TreeItem<>(ResourceHandler.getLocaleString(
+                "contractFunction") + " " + contract.getFunction()));
+        tiContract.getChildren().add(new TreeItem<>(ResourceHandler.getLocaleString(
+                "contractExpression") + " " + contract.getExpression()));
+
+        // if there are any arguments add this part of a tree
+        if (contract.getArguments().size() > 0) {
+            TreeItem<String> tiArguments = new TreeItem<>(ResourceHandler
+                    .getLocaleString("contractArguments"));
+            tiArguments.setExpanded(true);
+
+            for (String argument : contract.getArguments()) {
+                tiArguments.getChildren().add(new TreeItem<>(argument));
+            }
+            tiContract.getChildren().add(tiArguments);
+        }
+
+        return tiContract;
     }
 
 
@@ -428,11 +539,11 @@ public class ExtractorApplicationTab extends ApplicationTab{
         return fileList;
     }
 
-    public JavaFile getCurrentJavaFile() {
+    public JavaFileItem getCurrentJavaFile() {
         return currentJavaFile;
     }
 
-    public void setCurrentJavaFile(JavaFile currentJavaFile) {
+    public void setCurrentJavaFile(JavaFileItem currentJavaFile) {
         this.currentJavaFile = currentJavaFile;
     }
 }

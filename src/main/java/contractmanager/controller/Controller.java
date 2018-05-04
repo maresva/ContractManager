@@ -2,7 +2,6 @@ package contractmanager.controller;
 
 import contractmanager.ContractManager;
 import contractmanager.utility.FileHandler;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.stage.*;
@@ -200,6 +199,7 @@ public class Controller {
      *
      * @param event JavaFX event
      */
+    @FXML
     public void comparatorSelectAll(ActionEvent event) {
 
         ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().selectAll();

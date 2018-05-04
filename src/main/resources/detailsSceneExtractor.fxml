@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="644.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="contractmanager.controller.Controller">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="644.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="contractmanager.controller.Controller">
    <children>
       <SplitPane dividerPositions="0.24628450106157113" orientation="VERTICAL" prefHeight="473.0" prefWidth="644.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -65,14 +65,17 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label id="lblFileValue" layoutX="120.0" layoutY="32.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="10.0" />
+                  <Label id="lblFileValue" layoutX="120.0" layoutY="32.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="10.0">
+                     <font>
+                        <Font name="System Italic" size="12.0" />
+                     </font></Label>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="100.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
                   <TabPane layoutX="20.0" layoutY="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <tabs>
-                        <Tab closable="false" text="Contract Tree">
+                        <Tab closable="false" text="%treeRepresentation">
                            <content>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0">
                                  <children>
@@ -81,7 +84,7 @@
                               </AnchorPane>
                            </content>
                         </Tab>
-                        <Tab closable="false" text="JSON">
+                        <Tab closable="false" text="%jsonRepresentation">
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>

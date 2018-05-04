@@ -38,7 +38,7 @@ public class ExtractorFileList implements FileList {
     private static final String CLV_SELECTOR = "#clvFilesExtractor";
 
     /** List of files that are displayed in the CheckListView */
-    private List<JavaFile> files;
+    private List<JavaFileItem> files;
 
 
     public ExtractorFileList() {
@@ -129,13 +129,13 @@ public class ExtractorFileList implements FileList {
 
         // check whether this file is not already present
         boolean found = false;
-        for(JavaFile javaFile : files) {
+        for(JavaFileItem javaFileItem : files) {
 
-            if(javaFile == null || newFile == null){
+            if(javaFileItem == null || newFile == null){
                 return false;
             }
 
-            if(javaFile.getFullPath().equals(newFile.getAbsolutePath())) {
+            if(javaFileItem.getJavaFile().getFullPath().equals(newFile.getAbsolutePath())) {
                 found = true;
                 break;
             }
@@ -143,10 +143,18 @@ public class ExtractorFileList implements FileList {
 
         // if the file is not in the list yet - add it
         if (!found) {
-            JavaFile javaFile = ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi().retrieveContracts(newFile, true);
+            JavaFile javaFile = ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi().retrieveContracts(newFile, false);
 
             if(javaFile != null) {
-                files.add(javaFile);
+
+                boolean showNonContract = ContractManager.getApplicationData().getSettings().isShowNonContractObjects();
+                boolean visible = true;
+
+                if(javaFile.getContracts().isEmpty() && !showNonContract){
+                    visible = false;
+                }
+
+                files.add(new JavaFileItem(javaFile, visible));
                 ContractManager.getApplicationData().getExtractorApplicationTab().getGlobalStatistics().mergeStatistics(javaFile.getJavaFileStatistics());
 
                 return true;
@@ -182,7 +190,7 @@ public class ExtractorFileList implements FileList {
                 }
 
                 ContractManager.getApplicationData().getExtractorApplicationTab().getGlobalStatistics()
-                        .detachStatistics(files.get(newIndex).getJavaFileStatistics());
+                        .detachStatistics(files.get(newIndex).getJavaFile().getJavaFileStatistics());
                 files.remove(newIndex);
                 deletedFiles++;
             }
@@ -225,7 +233,7 @@ public class ExtractorFileList implements FileList {
 
         for(int i = 0 ; i < checkListView.getItems().size() ; i++ ) {
             if(checkListView.getCheckModel().isChecked(i)) {
-                javaFiles.add(files.get(i));
+                javaFiles.add(files.get(i).getJavaFile());
             }
         }
 
@@ -246,12 +254,17 @@ public class ExtractorFileList implements FileList {
 
         // update list of files in checkListView
         final ObservableList<String> fileItems = FXCollections.observableArrayList();
-        for (JavaFile file : files) {
+        for (JavaFileItem file : files) {
 
             if (file != null) {
-                fileItems.add(file.getShortPath());
+                file.updateVisibility();
+
+                if (file.isVisible()) {
+                    fileItems.add(file.getJavaFile().getShortPath());
+                }
             }
         }
+        
         checkListView.setItems(fileItems);
 
         // get number of files in total and number of currently selected
@@ -264,12 +277,22 @@ public class ExtractorFileList implements FileList {
         Button btn_select_all = (Button) ContractManager.scene.lookup("#btnExtractorSelectAll");
 
         if(files.size() > 0){
-            lblExtractorListEmpty.setVisible(false);
-            btn_select_all.setDisable(false);
+
+            if(getNumberOfVisibleFiles() > 0) {
+
+                lblExtractorListEmpty.setVisible(false);
+                btn_select_all.setDisable(false);
+            }
+            else{
+                lblExtractorListEmpty.setVisible(true);
+                lblExtractorListEmpty.setText(ResourceHandler.getLocaleString("labelEmptyListFilters"));
+                btn_select_all.setDisable(true);
+            }
         }
         else {
             ContractManager.getApplicationData().getExtractorApplicationTab().clearFileDetails();
             lblExtractorListEmpty.setVisible(true);
+            lblExtractorListEmpty.setText(ResourceHandler.getLocaleString("labelEmptyList"));
             btn_select_all.setDisable(true);
         }
 
@@ -316,7 +339,12 @@ public class ExtractorFileList implements FileList {
         Button btn_remove_files = (Button) ContractManager.scene.lookup("#btnExtractorRemoveFiles");
         Button btn_export_files = (Button) ContractManager.scene.lookup("#btnExportFilesExtractor");
 
-        if(numberOfFilesTotal-numberOfFilesChecked == 0){
+        if(numberOfFilesTotal == 0) {
+            btn_select_all.setText(ResourceHandler.getLocaleString("buttonSelectAll"));
+            btn_remove_files.setDisable(true);
+            btn_export_files.setDisable(true);
+        }
+        else if(numberOfFilesTotal-numberOfFilesChecked == 0){
             btn_select_all.setText(ResourceHandler.getLocaleString("buttonDeselectAll"));
             btn_remove_files.setDisable(false);
             btn_export_files.setDisable(false);
@@ -345,7 +373,7 @@ public class ExtractorFileList implements FileList {
     private void updateShortPath() {
 
         ContractManager.getApplicationData().getExtractorApplicationTab().getContractExtractorApi()
-                .updateShortPathOfJavaFiles(files);
+                .updateShortPathOfJavaFiles(getJavaFiles());
     }
 
 
@@ -366,10 +394,64 @@ public class ExtractorFileList implements FileList {
     }
 
 
+    /**
+     * Returns file on given ID taken in consideration the visibility of files.
+     *
+     * @param id    ID of desired file in CheckListView
+     * @return      JavaFileItem on given ID
+     */
+    public JavaFileItem getVisibleFileById(int id){
+
+        int foundVisible = 0;
+
+        for(int i = 0 ; i <= files.size() ; i++){
+
+            if(files.get(i).isVisible()){
+                foundVisible++;
+            }
+
+            if(foundVisible == id + 1){
+                return files.get(i);
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Return how many files are visible.
+     *
+     * @return  how many files are visible
+     */
+    public int getNumberOfVisibleFiles(){
+
+        int total = 0;
+
+        for(JavaFileItem javaFileItem : files){
+            if(javaFileItem.isVisible()){
+                total++;
+            }
+        }
+
+        return total;
+    }
+
 
     // Getters and Setters
-    public List<JavaFile> getFiles() {
+    public List<JavaFileItem> getFiles() {
         return files;
+    }
+
+    public List<JavaFile> getJavaFiles(){
+
+        List<JavaFile> javaFiles = new ArrayList<>();
+
+        for(JavaFileItem javaFileItem : files){
+            javaFiles.add(javaFileItem.getJavaFile());
+        }
+
+        return javaFiles;
     }
 
     public CheckListView getCheckListView() {

@@ -40,7 +40,7 @@ public class ComparatorFileList implements FileList {
     private static final String CLV_SELECTOR = "#clvFilesComparator";
 
     /** List of reports that are displayed in the CheckListView */
-    private List<JavaFileCompareReport> reports;
+    private List<ReportItem> reports;
 
     /** First folder of the comparison */
     private File firstFolder;
@@ -131,12 +131,20 @@ public class ComparatorFileList implements FileList {
                 // compare folders
                 JavaFolderCompareReport javaFolderCompareReport = ContractManager.getApplicationData().
                         getComparatorApplicationTab().getContractComparatorApi().compareJavaFolders(
-                        firstFolder, secondFolder, ContractManager.getApplicationData().getSettings().isReportEqual(),
-                        ContractManager.getApplicationData().getSettings().isReportOnlyContractChanges());
+                        firstFolder, secondFolder, true, true);
 
                 // save all reports
                 ContractManager.getApplicationData().getComparatorApplicationTab().setFolderCompareReport(javaFolderCompareReport);
-                reports = javaFolderCompareReport.getJavaFileCompareReports();
+                List<JavaFileCompareReport> javaFileCompareReports = javaFolderCompareReport.getJavaFileCompareReports();
+
+                reports = new ArrayList<>();
+                for(JavaFileCompareReport javaFileCompareReport : javaFileCompareReports) {
+
+                    ReportItem reportItem = new ReportItem(javaFileCompareReport);
+                    reportItem.updateVisibility();
+                    reports.add(reportItem);
+
+                }
 
                 // disable compare button to prevent unnecessary repeat
                 Button btnCompare = (Button) Utils.lookup("#btnCompare", ContractManager.getMainScene());
@@ -208,10 +216,14 @@ public class ComparatorFileList implements FileList {
 
         // update list of reports in checkListView
         final ObservableList<String> reportItems = FXCollections.observableArrayList();
-        for (JavaFileCompareReport report : reports) {
+        for (ReportItem report : reports) {
 
             if (report != null) {
-                reportItems.add(report.getThisFilePath());
+                report.updateVisibility();
+
+                if(report.isVisible()) {
+                    reportItems.add(report.getReport().getThisFilePath());
+                }
             }
         }
 
@@ -318,7 +330,7 @@ public class ComparatorFileList implements FileList {
         return checkListView;
     }
 
-    public List<?> getFiles() {
+    public List<ReportItem> getFiles() {
         return reports;
     }
 }

@@ -20,7 +20,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.CheckListView?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="800.0" prefHeight="473.0" prefWidth="644.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="contractmanager.controller.Controller">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="800.0" prefHeight="473.0" prefWidth="644.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="contractmanager.controller.Controller">
    <children>
       <TabPane focusTraversable="false" layoutY="60.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <tabs>
@@ -374,7 +374,7 @@
                                                 <Font name="System Bold" size="12.0" />
                                              </font>
                                           </Label>
-                                          <CheckListView id="clvFilesComparator" focusTraversable="false" layoutX="15.0" layoutY="-71.0" prefHeight="315.0" prefWidth="317.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="55.0" />
+                                          <CheckListView id="clvFilesComparator" layoutX="15.0" layoutY="-71.0" prefHeight="315.0" prefWidth="317.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="55.0" />
                                           <Label id="lblComparatorSelected" textAlignment="CENTER" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="15.0" />
                                           <Label id="lblComparatorListEmpty" alignment="CENTER" contentDisplay="CENTER" layoutX="145.0" layoutY="154.0" text="%labelComparatorEmptyList" textAlignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                           <Button id="btnComparatorSelectAll" disable="true" focusTraversable="false" layoutX="15.0" layoutY="30.0" mnemonicParsing="false" onAction="#comparatorSelectAll" text="%buttonSelectAll" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="25.0">

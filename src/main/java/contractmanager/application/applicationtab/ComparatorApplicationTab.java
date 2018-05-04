@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import contractmanager.application.Settings;
 import contractmanager.application.filelist.ComparatorFileList;
+import contractmanager.application.filelist.ReportItem;
 import contractmanager.utility.ResourceHandler;
 import contractmanager.utility.Utils;
 import contractmanager.ContractManager;
@@ -16,9 +17,16 @@ import cz.zcu.kiv.contractparser.model.ContractType;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * Class representing Comparator application tab. It contains the file list, currently selected report, api which
+ * provides ContractParser methods etc.
+ *
+ * @author Vaclav Mares
+ */
 public class ComparatorApplicationTab extends ApplicationTab {
 
     /** Provides methods form ContractParser that are used for contract comparison */
@@ -28,7 +36,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
     private ComparatorFileList fileList;
 
     /** Current JavaFolderCompareReport that is displayed at right bottom. It also opened in details window */
-    private JavaFileCompareReport currentReport;
+    private ReportItem currentReport;
 
     /** Compare report of current two folders. Among others contains reports and statistics */
     private JavaFolderCompareReport folderCompareReport;
@@ -129,7 +137,20 @@ public class ComparatorApplicationTab extends ApplicationTab {
         // if folderReport and statistics are not null - fill in data - otherwise clear the table
         if(folderCompareReport != null && folderCompareReport.getJavaFolderCompareStatistics() != null) {
 
-            JavaFolderCompareStatistics globalStatistics = folderCompareReport.getJavaFolderCompareStatistics();
+            //JavaFolderCompareStatistics globalStatistics = folderCompareReport.getJavaFolderCompareStatistics();
+
+            JavaFolderCompareStatistics globalStatistics = new JavaFolderCompareStatistics(
+                    folderCompareReport.getJavaFolderCompareStatistics().getFilesAdded(),
+                    folderCompareReport.getJavaFolderCompareStatistics().getFilesRemoved(),
+                    0, 0, 0);
+
+            for(ReportItem reportItem : fileList.getFiles()){
+
+                if(reportItem.isVisible()){
+                    globalStatistics.mergeFileStatistics(reportItem.getReport());
+                }
+            }
+
 
             lblContractEqual.setText("" + folderCompareReport.isContractEqual());
             lblApiEqual.setText("" + folderCompareReport.isApiEqual());
@@ -168,12 +189,12 @@ public class ComparatorApplicationTab extends ApplicationTab {
 
         if(selectedId >= 0 && selectedId < fileList.getFiles().size()) {
 
-            currentReport = (JavaFileCompareReport) fileList.getFiles().get(selectedId);
+            currentReport = fileList.getFiles().get(selectedId);
 
             // update labels
-            lblFile.setText(currentReport.getThisFilePath());
-            lblContractEqual.setText("" + currentReport.isContractEqual());
-            lblApiEqual.setText("" + currentReport.isApiEqual());
+            lblFile.setText(currentReport.getReport().getThisFilePath());
+            lblContractEqual.setText("" + currentReport.getReport().isContractEqual());
+            lblApiEqual.setText("" + currentReport.getReport().isApiEqual());
 
             // once some file is selected - Show details button becomes available
             btnShowDetails.setDisable(false);
@@ -199,7 +220,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
 
             String sceneFXMLName = ResourceHandler.getProperties().getString("sceneDetailsComparatorFileName");
             String windowName = ResourceHandler.getLocaleString("windowTitleDetails") + " - "
-                    + currentReport.getThisFilePath();
+                    + currentReport.getReport().getThisFilePath();
 
             super.prepareDetailsWindow(sceneFXMLName, windowName);
 
@@ -217,37 +238,37 @@ public class ComparatorApplicationTab extends ApplicationTab {
             taJson.setText(jsonInString);
 
             Label lblThisFileValue = (Label) Utils.lookup("#lblThisFileValue", detailsScene);
-            lblThisFileValue.setText("" + currentReport.getThisFilePath());
+            lblThisFileValue.setText("" + currentReport.getReport().getThisFilePath());
 
             Label lblOtherFileValue = (Label) Utils.lookup("#lblOtherFileValue", detailsScene);
-            lblOtherFileValue.setText("" + currentReport.getOtherFilePath());
+            lblOtherFileValue.setText("" + currentReport.getReport().getOtherFilePath());
 
             Label lblContractEqual = (Label) Utils.lookup("#lblContractEqualValue", detailsScene);
-            lblContractEqual.setText("" + currentReport.isContractEqual());
+            lblContractEqual.setText("" + currentReport.getReport().isContractEqual());
 
             Label lblApiEqual = (Label) Utils.lookup("#lblApiEqualValue", detailsScene);
-            lblApiEqual.setText("" + currentReport.isApiEqual());
+            lblApiEqual.setText("" + currentReport.getReport().isApiEqual());
 
             Label lblContractsChanged = (Label) Utils.lookup("#lblContractsChangedValue", detailsScene);
-            lblContractsChanged.setText("" + currentReport.getJavaFileCompareStatistics().getContractsChanged());
+            lblContractsChanged.setText("" + currentReport.getReport().getJavaFileCompareStatistics().getContractsChanged());
 
             Label lblContractsAdded = (Label) Utils.lookup("#lblContractsAddedValue", detailsScene);
-            lblContractsAdded.setText("" + currentReport.getJavaFileCompareStatistics().getContractsAdded());
+            lblContractsAdded.setText("" + currentReport.getReport().getJavaFileCompareStatistics().getContractsAdded());
 
             Label lblContractsRemoved = (Label) Utils.lookup("#lblContractsRemovedValue", detailsScene);
-            lblContractsRemoved.setText("" + currentReport.getJavaFileCompareStatistics().getContractsRemoved());
+            lblContractsRemoved.setText("" + currentReport.getReport().getJavaFileCompareStatistics().getContractsRemoved());
 
             Label lblMethodsAdded = (Label) Utils.lookup("#lblMethodsAddedValue", detailsScene);
-            lblMethodsAdded.setText("" + currentReport.getJavaFileCompareStatistics().getMethodsAdded());
+            lblMethodsAdded.setText("" + currentReport.getReport().getJavaFileCompareStatistics().getMethodsAdded());
 
             Label lblMethodsRemoved = (Label) Utils.lookup("#lblMethodsRemovedValue", detailsScene);
-            lblMethodsRemoved.setText("" + currentReport.getJavaFileCompareStatistics().getMethodsRemoved());
+            lblMethodsRemoved.setText("" + currentReport.getReport().getJavaFileCompareStatistics().getMethodsRemoved());
 
             Label lblClassesAdded = (Label) Utils.lookup("#lblClassesAddedValue", detailsScene);
-            lblClassesAdded.setText("" + currentReport.getJavaFileCompareStatistics().getClassesAdded());
+            lblClassesAdded.setText("" + currentReport.getReport().getJavaFileCompareStatistics().getClassesAdded());
 
             Label lblClassesRemoved = (Label) Utils.lookup("#lblClassesRemovedValue", detailsScene);
-            lblClassesRemoved.setText("" + currentReport.getJavaFileCompareStatistics().getClassesRemoved());
+            lblClassesRemoved.setText("" + currentReport.getReport().getJavaFileCompareStatistics().getClassesRemoved());
 
             TreeView<String> treeView = (TreeView<String>) Utils.lookup("#tvContractDetails", detailsScene);
             prepareTreeView(treeView);
@@ -263,26 +284,36 @@ public class ComparatorApplicationTab extends ApplicationTab {
      */
     private void prepareTreeView(TreeView<String> treeView){
 
+        boolean reportOnlyContractChanges = ContractManager.getApplicationData().getSettings().isReportOnlyContractChanges();
+        boolean reportEqual = ContractManager.getApplicationData().getSettings().isReportEqual();
+        HashMap<ContractType, Boolean> contractTypes = ContractManager.getApplicationData().getSettings().getContractTypes();
+
         TreeItem<String> tiJavaFileCompareReport = new TreeItem<>(ResourceHandler.getLocaleString("javaFileCompareReport"));
         tiJavaFileCompareReport.setExpanded(true);
 
         TreeItem<String> tiApiChanges = new TreeItem<>(ResourceHandler.getLocaleString("apiChanges"));
         tiApiChanges.setExpanded(true);
 
-        for(ApiChange apiChange : currentReport.getApiChanges()) {
+        if(!currentReport.getReport().getApiChanges().isEmpty() && !reportOnlyContractChanges){
+            for (ApiChange apiChange : currentReport.getReport().getApiChanges()) {
 
-            TreeItem<String> tiApiChange = new TreeItem<>(apiChange.getApiType() + " - " + apiChange.getApiState());
-            tiApiChange.setExpanded(true);
+                TreeItem<String> tiApiChange = new TreeItem<>(apiChange.getApiType() + " - " + apiChange.getApiState());
+                tiApiChange.setExpanded(true);
 
-            TreeItem<String> tiApiChangeSignature = new TreeItem<>(ResourceHandler.getLocaleString(
-                    "signature") + " " + apiChange.getSignature());
-            tiApiChange.getChildren().add(tiApiChangeSignature);
+                TreeItem<String> tiApiChangeSignature = new TreeItem<>(ResourceHandler.getLocaleString(
+                        "signature") + " " + apiChange.getSignature());
+                tiApiChange.getChildren().add(tiApiChangeSignature);
 
-            TreeItem<String> tiApiChangeContracts = new TreeItem<>(ResourceHandler.getLocaleString(
-                    "contractsAffected") + " " + apiChange.getNumberOfContracts());
-            tiApiChange.getChildren().add(tiApiChangeContracts);
+                TreeItem<String> tiApiChangeContracts = new TreeItem<>(ResourceHandler.getLocaleString(
+                        "contractsAffected") + " " + apiChange.getNumberOfContracts());
+                tiApiChange.getChildren().add(tiApiChangeContracts);
 
-            tiApiChanges.getChildren().add(tiApiChange);
+                tiApiChanges.getChildren().add(tiApiChange);
+            }
+        }
+
+        if(tiApiChanges.getChildren().isEmpty()){
+            tiApiChanges.setValue(tiApiChanges.getValue() + " - " + ResourceHandler.getLocaleString("treeEmpty"));
         }
 
         tiJavaFileCompareReport.getChildren().add(tiApiChanges);
@@ -290,28 +321,38 @@ public class ComparatorApplicationTab extends ApplicationTab {
         TreeItem<String> tiCompareReports = new TreeItem<>(ResourceHandler.getLocaleString("contractCompareReports"));
         tiCompareReports.setExpanded(true);
 
-        for(ContractCompareReport compareReport: currentReport.getContractCompareReports()){
+        for(ContractCompareReport compareReport: currentReport.getReport().getContractCompareReports()){
 
-            TreeItem<String> tiCompareReport = new TreeItem<>(createCompareReportTitle(compareReport));
-            tiCompareReport.setExpanded(true);
+            if(compareReport.getContractComparison() != ContractComparison.EQUAL || reportEqual) {
 
-            TreeItem<String> tiClass = new TreeItem<>(ResourceHandler.getLocaleString("treeClass")
-                    + " " + compareReport.getClassName());
-            tiCompareReport.getChildren().add(tiClass);
+                if(contractTypes.get(compareReport.getContractType())) {
 
-            TreeItem<String> tiMethod = new TreeItem<>(ResourceHandler.getLocaleString("treeMethod")
-                    + " " + compareReport.getMethodName());
-            tiCompareReport.getChildren().add(tiMethod);
+                    TreeItem<String> tiCompareReport = new TreeItem<>(createCompareReportTitle(compareReport));
+                    tiCompareReport.setExpanded(true);
 
-            TreeItem<String> tiThisContract = new TreeItem<>(ResourceHandler.getLocaleString("treeThisContract")
-                    + " " + compareReport.getThisContractExpression());
-            tiCompareReport.getChildren().add(tiThisContract);
+                    TreeItem<String> tiClass = new TreeItem<>(ResourceHandler.getLocaleString("treeClass")
+                            + " " + compareReport.getClassName());
+                    tiCompareReport.getChildren().add(tiClass);
 
-            TreeItem<String> tiOtherContract = new TreeItem<>(ResourceHandler.getLocaleString("treeOtherContract")
-                    + " " + compareReport.getOtherContractExpression());
-            tiCompareReport.getChildren().add(tiOtherContract);
+                    TreeItem<String> tiMethod = new TreeItem<>(ResourceHandler.getLocaleString("treeMethod")
+                            + " " + compareReport.getMethodName());
+                    tiCompareReport.getChildren().add(tiMethod);
 
-            tiCompareReports.getChildren().add(tiCompareReport);
+                    TreeItem<String> tiThisContract = new TreeItem<>(ResourceHandler.getLocaleString("treeThisContract")
+                            + " " + compareReport.getThisContractExpression());
+                    tiCompareReport.getChildren().add(tiThisContract);
+
+                    TreeItem<String> tiOtherContract = new TreeItem<>(ResourceHandler.getLocaleString("treeOtherContract")
+                            + " " + compareReport.getOtherContractExpression());
+                    tiCompareReport.getChildren().add(tiOtherContract);
+
+                    tiCompareReports.getChildren().add(tiCompareReport);
+                }
+            }
+        }
+
+        if(tiCompareReports.getChildren().isEmpty()){
+            tiCompareReports.setValue(tiCompareReports.getValue() + " - " + ResourceHandler.getLocaleString("treeEmpty"));
         }
 
         tiJavaFileCompareReport.getChildren().add(tiCompareReports);
@@ -327,7 +368,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
      */
     private String createCompareReportTitle(ContractCompareReport compareReport) {
 
-        String title = ResourceHandler.getLocaleString("treeContract") + " - ";
+        String title = ResourceHandler.getLocaleString("treeContract") + " (" + compareReport.getContractType() + ") - ";
 
         if(compareReport.getApiState() == ApiState.FOUND_PAIR){
             title += compareReport.getContractComparison();
@@ -357,7 +398,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
         this.folderCompareReport = folderCompareReport;
     }
 
-    public void setCurrentReport(JavaFileCompareReport currentReport) {
+    public void setCurrentReport(ReportItem currentReport) {
         this.currentReport = currentReport;
     }
 }

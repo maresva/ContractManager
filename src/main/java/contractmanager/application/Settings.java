@@ -38,7 +38,7 @@ public class Settings {
             this.contractTypes.put(contractType, true);
         }
     }
-
+    
 
     @Override
     public String toString() {
