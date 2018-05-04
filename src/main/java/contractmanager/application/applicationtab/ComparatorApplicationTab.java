@@ -189,7 +189,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
 
         if(selectedId >= 0 && selectedId < fileList.getFiles().size()) {
 
-            currentReport = fileList.getFiles().get(selectedId);
+            currentReport = fileList.getVisibleFileById(selectedId);
 
             // update labels
             lblFile.setText(currentReport.getReport().getThisFilePath());

@@ -325,6 +325,31 @@ public class ComparatorFileList implements FileList {
     }
 
 
+    /**
+     * Returns report on given ID taken in consideration the visibility of reports.
+     *
+     * @param id    ID of desired file in CheckListView
+     * @return      ReportItem on given ID
+     */
+    public ReportItem getVisibleFileById(int id){
+
+        int foundVisible = 0;
+
+        for(int i = 0 ; i <= reports.size() ; i++){
+
+            if(reports.get(i).isVisible()){
+                foundVisible++;
+            }
+
+            if(foundVisible == id + 1){
+                return reports.get(i);
+            }
+        }
+
+        return null;
+    }
+
+
     // Getters and Setters
     public CheckListView getCheckListView() {
         return checkListView;
