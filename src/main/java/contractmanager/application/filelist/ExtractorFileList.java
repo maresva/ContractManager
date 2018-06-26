@@ -186,7 +186,6 @@ public class ExtractorFileList implements FileList {
             if(newIndex < files.size()) {
 
                 newIndex = getVisibleFileId(newIndex);
-                System.out.println("Removing ... " + newIndex);
 
                 if(files.get(newIndex).equals(ContractManager.getApplicationData().getExtractorApplicationTab().getCurrentJavaFile())){
                     ContractManager.getApplicationData().getExtractorApplicationTab().clearFileDetails();
