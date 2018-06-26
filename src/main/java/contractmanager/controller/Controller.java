@@ -194,19 +194,6 @@ public class Controller {
 
 
     /**
-     * This action is called when (De)Select All button is pressed. It does as it says its label. If it says Select All
-     * it select all items. Otherwise it deselects all.
-     *
-     * @param event JavaFX event
-     */
-    @FXML
-    public void comparatorSelectAll(ActionEvent event) {
-
-        ContractManager.getApplicationData().getComparatorApplicationTab().getFileList().selectAll();
-    }
-
-
-    /**
      * This action applies filter which consists of multiple check boxes.
      *
      * @param event JavaFX event

@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import org.apache.log4j.Logger;
@@ -33,8 +34,8 @@ public class ComparatorFileList implements FileList {
     /** Log4j logger for this class */
     private final static Logger logger = Logger.getLogger(String.valueOf(ComparatorFileList.class));
 
-    /** CheckListView as a graphics representation of this FileList */
-    private CheckListView checkListView;
+    /** ListView as a graphics representation of this FileList */
+    private ListView listView;
 
     /** Selector for this file list to avoid multiple raw Strings */
     private static final String CLV_SELECTOR = "#clvFilesComparator";
@@ -77,7 +78,7 @@ public class ComparatorFileList implements FileList {
             setFolderLabel(selectedDirectory, "#lblFolder2Comparator");
         }
 
-        // if both folders are set - enable compare button
+        // if both folders are set - enable compare and export button
         if(firstFolder != null && secondFolder != null && !compared){
             Button btnCompare = (Button) Utils.lookup("#btnCompare", ContractManager.getMainScene());
             btnCompare.setDisable(false);
@@ -86,6 +87,9 @@ public class ComparatorFileList implements FileList {
         else if(compared){
             clearScene(isFirst);
             compared = false;
+
+            Button btnExport = (Button) Utils.lookup("#btnExportFilesComparator", ContractManager.getMainScene());
+            btnExport.setDisable(true);
         }
     }
 
@@ -151,6 +155,9 @@ public class ComparatorFileList implements FileList {
                 btnCompare.setDisable(true);
                 compared = true;
 
+                Button btnExport = (Button) Utils.lookup("#btnExportFilesComparator", ContractManager.getMainScene());
+                btnExport.setDisable(false);
+
                 logger.info(ResourceHandler.getLocaleString("infoReportsAdded", reports.size()));
 
                 return true;
@@ -212,7 +219,7 @@ public class ComparatorFileList implements FileList {
      */
     public void updateList() {
 
-        checkListView = (CheckListView) ContractManager.scene.lookup(CLV_SELECTOR);
+        listView = (ListView) ContractManager.scene.lookup(CLV_SELECTOR);
 
         // update list of reports in checkListView
         final ObservableList<String> reportItems = FXCollections.observableArrayList();
@@ -227,44 +234,33 @@ public class ComparatorFileList implements FileList {
             }
         }
 
-        checkListView.setItems(reportItems);
-
-        // get number of files in total and number of currently selected
-        int numberOfReportsTotal = checkListView.getItems().size();
-        int numberOfReportsChecked = checkListView.getCheckModel().getCheckedIndices().size();
-        updateSelected(numberOfReportsTotal, numberOfReportsChecked);
+        listView.setItems(reportItems);
 
         // if there are no files - show label informing about empty list and disable select all check box
         Label lblComparatorListEmpty = (Label) ContractManager.scene.lookup("#lblComparatorListEmpty");
-        Button btnComparatorSelectAll = (Button) ContractManager.scene.lookup("#btnComparatorSelectAll");
 
         if(reports.size() > 0){
-            lblComparatorListEmpty.setVisible(false);
-            btnComparatorSelectAll.setDisable(false);
+
+            if(isAnyFileVisible()) {
+                lblComparatorListEmpty.setVisible(false);
+                lblComparatorListEmpty.setText(ResourceHandler.getLocaleString("labelComparatorEmptyList"));
+            }
+            else{
+                lblComparatorListEmpty.setVisible(true);
+                lblComparatorListEmpty.setText(ResourceHandler.getLocaleString("labelEmptyListFilters"));
+            }
         }
         else {
             lblComparatorListEmpty.setVisible(true);
-            btnComparatorSelectAll.setDisable(true);
+            lblComparatorListEmpty.setText(ResourceHandler.getLocaleString("labelComparatorEmptyList"));
         }
 
-        // set on CheckBox event
-        checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends String> c) {
-
-                // get number of files in total and number of currently selected
-                int numberOfReportsTotal = checkListView.getItems().size();
-                int numberOfReportsChecked = checkListView.getCheckModel().getCheckedIndices().size();
-                updateSelected(numberOfReportsTotal, numberOfReportsChecked);
-            }
-        });
-
         // update details when item is highlighted using mouse click
-        checkListView.setOnMouseClicked(event -> ContractManager.getApplicationData().getComparatorApplicationTab()
+        listView.setOnMouseClicked(event -> ContractManager.getApplicationData().getComparatorApplicationTab()
                 .updateReportDetails());
 
         // update details when item is highlighted using arrow keys
-        checkListView.setOnKeyReleased(event -> {
+        listView.setOnKeyReleased(event -> {
             KeyCode keyCode = event.getCode();
             if(keyCode.isArrowKey()) {
                 ContractManager.getApplicationData().getComparatorApplicationTab().updateReportDetails();
@@ -276,52 +272,19 @@ public class ComparatorFileList implements FileList {
 
 
     /**
-     * This method updates (De)select All button. If there are some unselected files it has Select All label.
-     * Otherwise it has Deselect All label. It also updates label informing about the number of selected files.
+     * Return whether is any file visible.
      *
-     * @param numberOfFilesTotal        Total number of files
-     * @param numberOfFilesChecked      Number of selected files
+     * @return      true if any file is visible
      */
-    private void updateSelected(int numberOfFilesTotal, int numberOfFilesChecked) {
+    private boolean isAnyFileVisible() {
 
-        // update Select all check box (is checked only if all files are selected)
-        Button btnSelectAll = (Button) ContractManager.scene.lookup("#btnComparatorSelectAll");
-        Button btnExportFiles = (Button) ContractManager.scene.lookup("#btnExportFilesComparator");
-
-        if(numberOfFilesTotal-numberOfFilesChecked == 0){
-            btnSelectAll.setText(ResourceHandler.getLocaleString("buttonDeselectAll"));
-            btnExportFiles.setDisable(false);
-        }
-        else if(numberOfFilesChecked > 0){
-            btnSelectAll.setText(ResourceHandler.getLocaleString("buttonSelectAll"));
-            btnExportFiles.setDisable(false);
-        }
-        else{
-            btnSelectAll.setText(ResourceHandler.getLocaleString("buttonSelectAll"));
-            btnExportFiles.setDisable(true);
+        for(ReportItem reportItem : reports){
+            if(reportItem.isVisible()){
+                return true;
+            }
         }
 
-        // update info label about number of selected files
-        Label lbSelected = (Label) ContractManager.scene.lookup("#lblComparatorSelected");
-        lbSelected.setText(ResourceHandler.getLocaleString("labelSelectedFiles") + ": "
-                + numberOfFilesChecked + " / " + numberOfFilesTotal);
-    }
-
-    
-    /**
-     * This action is called when (De)Select All button is pressed. It does as it says its label. If it says Select All
-     * it select all items. Otherwise it deselects all.
-     */
-    public void selectAll() {
-
-        Button btnComparatorSelectAll = (Button) ContractManager.scene.lookup("#btnComparatorSelectAll");
-
-        if(btnComparatorSelectAll.getText().equals(ResourceHandler.getLocaleString("buttonSelectAll"))) {
-            checkListView.getCheckModel().checkAll();
-        }
-        else{
-            checkListView.getCheckModel().clearChecks();
-        }
+        return false;
     }
 
 
@@ -351,8 +314,8 @@ public class ComparatorFileList implements FileList {
 
 
     // Getters and Setters
-    public CheckListView getCheckListView() {
-        return checkListView;
+    public ListView getListView() {
+        return listView;
     }
 
     public List<ReportItem> getFiles() {

@@ -289,6 +289,7 @@ public class ExtractorFileList implements FileList {
             if(getNumberOfVisibleFiles() > 0) {
 
                 lblExtractorListEmpty.setVisible(false);
+                lblExtractorListEmpty.setText(ResourceHandler.getLocaleString("labelEmptyList"));
                 btn_select_all.setDisable(false);
             }
             else{

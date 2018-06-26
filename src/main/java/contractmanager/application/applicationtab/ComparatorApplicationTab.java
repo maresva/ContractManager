@@ -185,7 +185,7 @@ public class ComparatorApplicationTab extends ApplicationTab {
         Button btnShowDetails = (Button) ContractManager.getMainScene().lookup("#btnShowDetailsComparator");
 
         // get selected file and save it into application model
-        int selectedId = fileList.getCheckListView().getSelectionModel().getSelectedIndex();
+        int selectedId = fileList.getListView().getSelectionModel().getSelectedIndex();
 
         if(selectedId >= 0 && selectedId < fileList.getFiles().size()) {
 
