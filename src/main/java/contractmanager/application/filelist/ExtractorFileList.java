@@ -185,6 +185,9 @@ public class ExtractorFileList implements FileList {
 
             if(newIndex < files.size()) {
 
+                newIndex = getVisibleFileId(newIndex);
+                System.out.println("Removing ... " + newIndex);
+
                 if(files.get(newIndex).equals(ContractManager.getApplicationData().getExtractorApplicationTab().getCurrentJavaFile())){
                     ContractManager.getApplicationData().getExtractorApplicationTab().clearFileDetails();
                 }
@@ -233,7 +236,12 @@ public class ExtractorFileList implements FileList {
 
         for(int i = 0 ; i < checkListView.getItems().size() ; i++ ) {
             if(checkListView.getCheckModel().isChecked(i)) {
-                javaFiles.add(files.get(i).getJavaFile());
+
+                JavaFileItem javaFileItem = getVisibleFileById(i);
+
+                if(javaFileItem != null) {
+                    javaFiles.add(javaFileItem.getJavaFile());
+                }
             }
         }
 
@@ -402,6 +410,25 @@ public class ExtractorFileList implements FileList {
      */
     public JavaFileItem getVisibleFileById(int id){
 
+        int visibleFileId = getVisibleFileId(id);
+
+        if(visibleFileId >= 0 && visibleFileId < files.size()) {
+            return files.get(visibleFileId);
+        }
+        else{
+            return null;
+        }
+    }
+
+    
+    /**
+     * Returns true ID of file taken in consideration the visibility of files.
+     *
+     * @param id    ID of desired file in CheckListView
+     * @return      ID of JavaFileItem (-1 if not found)
+     */
+    private int getVisibleFileId(int id){
+
         int foundVisible = 0;
 
         for(int i = 0 ; i <= files.size() ; i++){
@@ -411,11 +438,11 @@ public class ExtractorFileList implements FileList {
             }
 
             if(foundVisible == id + 1){
-                return files.get(i);
+                return i;
             }
         }
 
-        return null;
+        return -1;
     }
 
 
