@@ -52,7 +52,8 @@ public class ExtractorFileList implements FileList {
      * File processing is done via JavaFX task and during this action loading window is displayed which show current
      * progress on progress bar (each processed file updates progress bar).
      *
-     * @param inputFiles     List of files to be parsed
+     * @param inputFiles        List of files to be parsed
+     * @param selectedDirectory Folder to be parsed (if inputFiles are null)
      */
     public void addFiles(List<File> inputFiles, File selectedDirectory) {
 

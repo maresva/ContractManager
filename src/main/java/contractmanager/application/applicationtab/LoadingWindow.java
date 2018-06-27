@@ -58,6 +58,8 @@ public class LoadingWindow {
 
     /**
      * When loading is done (finished on cancelled) - list is updated and loading window is hidden.
+     *
+     * @param fileList  List of files that is being loaded
      */
     public void hide(FileList fileList) {
 
